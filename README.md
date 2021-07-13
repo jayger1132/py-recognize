@@ -12,12 +12,42 @@ if not os.path.exists(save_path):
 ```
 #### 新增file的話可以使用os.open就可以了/csv.writerow寫一行
 ```py
-with open('./data/csv/Biceps_curl.csv', 'w', newline='') as csvfile:
-        # 建立 CSV 檔寫入器
-        writer = csv.writer(csvfile)
-        # 寫入一列資料
-        writer.writerow(['X', 'Y', 'Score'])
-        # 寫入另外幾列資料
-        for i in range(0,24):
-            writer.writerow([str(datum.poseKeypoints[0][i][0]),str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])])
+# 'a+' 是附加在後面 'a'是在前面
+with open('./data/csv/Biceps_curl.csv', 'a+', newline='') as csvfile:
+    # 建立 CSV 檔寫入器
+    writer = csv.writer(csvfile)
+    # 寫入另外幾列資料
+    for i in range(0,24):
+        writer.writerow([str(datum.poseKeypoints[0][i][0]),str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])])
+    writer.writerow(["","",""])
 ```
+#### parser
+```py
+# Flags
+parser = argparse.ArgumentParser()
+# "-i"也可寫成簡寫
+parser.add_argument("--image_dir", default="./data/imgs/from_video/Biceps_curl/img_0-99/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--no_display", default=False, help="Enable to disable the visual display.")
+#parse_known_args()使用時機是argument不只有一個，當命令中傳入之後才會用到的選項時不會報錯而是先存起來保留到之後使用 參考資料有
+args = parser.parse_known_args()
+#print(args[0].image_dir)
+```
+#### 辨識 單張/多張圖片 
+```py
+# Process 1
+datum = op.Datum()
+imageToProcess = cv2.imread(args[0].image_path)
+datum.cvInputData = imageToProcess
+opWrapper.emplaceAndPop(op.VectorDatum([datum]))
+# Process mutiple and display images 
+imagePaths = op.get_images_on_directory(args[0].image_dir)
+for imagePath in imagePaths:
+    datum = op.Datum()
+    imageToProcess = cv2.imread(imagePath)
+    datum.cvInputData = imageToProcess
+    opWrapper.emplaceAndPop(op.VectorDatum([datum]))
+    print(str(datum.poseKeypoints))
+```
+##### 參考資料
+##### https://www.runoob.com/python/python-func-open.html
+##### https://www.huaweicloud.com/articles/5b5c98238d126a90ca6d963e06cc9c06.html

@@ -4,6 +4,7 @@ import csv
 import sys
 import cv2
 import os
+import time
 from sys import platform
 import argparse
 
@@ -37,9 +38,12 @@ try:
 
     # Flags
     parser = argparse.ArgumentParser()
-    parser.add_argument("--image_path", default="./data/imgs/from_video/Biceps_curl/img_0-99/Biceps_curl-1.jpg", help="Process an image. Read all standard formats (jpg, png, bmp, etc.).")
+    parser.add_argument("--image_dir", default="./data/imgs/from_video/Biceps_curl/img_0-99/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+    parser.add_argument("--no_display", default=False, help="Enable to disable the visual display.")
+    #parse_known_args()使用時機是argument不只有一個，當命令中傳入之後才會用到的選項時不會報錯而是先存起來保留到之後使用
+    #https://www.huaweicloud.com/articles/5b5c98238d126a90ca6d963e06cc9c06.html
     args = parser.parse_known_args()
-
+    #print(args[0].image_dir)
     # Custom Params (refer to include/openpose/flags.hpp for more parameters)
     params = dict()
     params["model_folder"] = "./models/"
@@ -65,26 +69,44 @@ try:
     opWrapper.configure(params)
     opWrapper.start()
 
-    # Process Image
-    datum = op.Datum()
-    imageToProcess = cv2.imread(args[0].image_path)
-    datum.cvInputData = imageToProcess
-    opWrapper.emplaceAndPop(op.VectorDatum([datum]))
+    # Read frames on directory
+    imagePaths = op.get_images_on_directory(args[0].image_dir);
+    start = time.time()
+    print("Body keypoints: \n")
 
-    # Display Image
-    print("Body keypoints: \n" + str(datum.poseKeypoints))
-    for i in range(0,24):
-        print(str(datum.poseKeypoints[0][i]),"\n")
-
-    #write csv
     with open('./data/csv/Biceps_curl.csv', 'w', newline='') as csvfile:
-        # 建立 CSV 檔寫入器
-        writer = csv.writer(csvfile)
-        # 寫入一列資料
-        writer.writerow(['X', 'Y', 'Score'])
-        # 寫入另外幾列資料
-        for i in range(0,24):
-            writer.writerow([str(datum.poseKeypoints[0][i][0]),str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])])
+            # 建立 CSV 檔寫入器
+            writer = csv.writer(csvfile)
+            # 寫入一列資料
+            writer.writerow(['X', 'Y', 'Score'])
+    # Process and display images
+    for imagePath in imagePaths:
+        datum = op.Datum()
+        imageToProcess = cv2.imread(imagePath)
+        datum.cvInputData = imageToProcess
+        opWrapper.emplaceAndPop(op.VectorDatum([datum]))
+        print(str(datum.poseKeypoints))
+        #write csv
+        # 'a+' 是附加在後面 'a'是在前面
+        with open('./data/csv/Biceps_curl.csv', 'a+', newline='') as csvfile:
+            # 建立 CSV 檔寫入器
+            writer = csv.writer(csvfile)
+            # 寫入另外幾列資料
+            for i in range(0,24):
+                writer.writerow([str(datum.poseKeypoints[0][i][0]),str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])])
+            writer.writerow(["","",""])
+
+        if not args[0].no_display:
+            cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", datum.cvOutputData)
+            key = cv2.waitKey(15)
+            if key == 27: break
+
+    end = time.time()
+    print("OpenPose demo successfully finished. Total time: " + str(end - start) + " seconds")
+    
+    
+
+    
             
     #cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", datum.cvOutputData)
     cv2.waitKey(0)
