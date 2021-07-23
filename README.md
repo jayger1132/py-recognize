@@ -48,6 +48,17 @@ for imagePath in imagePaths:
     opWrapper.emplaceAndPop(op.VectorDatum([datum]))
     print(str(datum.poseKeypoints))
 ```
+#### DF用法 , loc/iloc 差在iloc通常都是用數字(index去取資料) loc是用"name"
+```py
+X=pd.DataFrame(data,columns=data.columns[:-1])
+print (X.iloc[:,0:2]) #這樣是 columns0~2
+print (X.iloc[:,::-1]) #這樣是 columns反過來輸出
+print (X.iloc[::-1,:]) #這樣是 index反過來輸出
+print (X.loc[:,"X"])
+#單純輸出X沒辦法看到全部的資料，因為是concat合併的，就已經依照輸入的data來排列順序了
+print(X)
+```
 ##### 參考資料
 ##### https://www.runoob.com/python/python-func-open.html
 ##### https://www.huaweicloud.com/articles/5b5c98238d126a90ca6d963e06cc9c06.html
+##### https://leemeng.tw/practical-pandas-tutorial-for-aspiring-data-scientists.html
