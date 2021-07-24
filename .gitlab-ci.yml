@@ -1,0 +1,14 @@
+include: 
+  - project: 'csie-406/doc-gitlab-406'
+    ref: master
+    file: 'csie-406-ci.yaml'
+
+#variables:
+#  DOCKER_IP: 120.105.129.174
+#  FF_GITLAB_REGISTRY_HELPER_IMAGE: "true"
+
+stages:
+  - build
+  - test
+  - production
+  - deploy
