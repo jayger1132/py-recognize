@@ -1,3 +1,6 @@
+# Python圖像辨識專案
+[![Quality gate](https://sonarqube.210.mlc.app/api/project_badges/quality_gate?project=py-recognize-26)](https://sonarqube.210.mlc.app/dashboard?id=py-recognize-26)
+
 ## 設定dir必須要以英文為主不然抓path很容易出問題
 #### 輸出放入的檔案 cv2.imshow('',img)
 ```py
