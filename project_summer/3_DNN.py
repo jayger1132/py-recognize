@@ -24,6 +24,7 @@ def build_model_1():
     model.add(Dense(16, activation='tanh'))
     model.add(Dense(8, activation='tanh'))
     model.add(Dense(4, activation='tanh'))
+    #Softmax 運算使得最後一層輸出的機率分佈總和為
     model.add(Dense(TARGET_DIM, activation='softmax'))
     return model
 
@@ -38,7 +39,7 @@ df_bending_test = pd.read_csv('./data/csv/Biceps_curl_Bending_Test.csv')
 df_bending_test['target'] = TARGET_BENDING
 #有時候格式跑掉可以先去第一排+個字在重新run 我是在Score旁+一行
 X ,y = handleData([df_straight,df_bending,df_straight_test,df_bending_test])
-#test_size=0.8 -> training : test = 8 : 2
+#test_size=0.2 -> training : test = 8 : 2
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=39)
 #DF用法 , loc/iloc 差在iloc通常都是用數字(index去取資料) loc是用"name"
 #print (X.iloc[:,0:2]) 這樣是 columns0~2

@@ -61,6 +61,22 @@ print (X.loc[:,"X"])
 #單純輸出X沒辦法看到全部的資料，因為是concat合併的，就已經依照輸入的data來排列順序了
 print(X)
 ```
+### 讀取的格式跑掉
+```py
+#有時候格式跑掉可以先去第一排+個字在重新run 我是在Score旁+一行，再回來執行
+df_bending_test = pd.read_csv('./data/csv/Biceps_curl_Bending_Test.csv')
+```
+### 合併資料
+```py
+#axis=0通常是直的合併 1為橫的
+d = pd.concat(datas,axis=0)
+```
+### train_test_split 前面有先把csv合併儲存成dataframe的格式
+```py
+#分出train,test。test_size=0.2 -> training : test = 8 : 2。random_state=None和random_state=0是不一樣的，若為None時，劃分出來的測試集或訓練集中，其類標籤的比例也是隨機的。random_state 隨機數的種子，種子相同就算例子不同也會產生相同的隨機數
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=39)
+```
+
 ##### 參考資料
 ##### https://www.runoob.com/python/python-func-open.html
 ##### https://www.huaweicloud.com/articles/5b5c98238d126a90ca6d963e06cc9c06.html
