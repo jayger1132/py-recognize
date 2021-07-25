@@ -40,7 +40,7 @@ try:
 
     # Flags
     parser = argparse.ArgumentParser()
-    parser.add_argument("--image_dir", default="./data/imgs/from_video/Biceps_curl/straight/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+    parser.add_argument("--image_dir", default="./data/imgs/from_video/Biceps_curl/bending_test/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
     parser.add_argument("--no_display", default=False, help="Enable to disable the visual display.")
     #parse_known_args()使用時機是argument不只有一個，當命令中傳入之後才會用到的選項時不會報錯而是先存起來保留到之後使用
     args = parser.parse_known_args()
@@ -75,7 +75,7 @@ try:
     start = time.time()
     print("Body keypoints: \n")
     #enviroment
-    csv_path = "./data/csv/Biceps_curl_Straight.csv"
+    csv_path = "./data/csv/Biceps_curl_Bending_Test.csv"
     with open(csv_path, 'w', newline='') as csvfile:
             # 建立 CSV 檔寫入器
             writer = csv.writer(csvfile)
