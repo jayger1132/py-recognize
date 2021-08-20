@@ -19,7 +19,7 @@ def handleData(datas):
     return (tx,ty)
 def build_model_1():
     model = Sequential()
-    model.add(Dense(64, input_shape=(72, ), activation='tanh'))
+    model.add(Dense(64, input_shape=(75, ), activation='tanh'))
     model.add(Dense(32, activation='tanh'))
     model.add(Dense(16, activation='tanh'))
     model.add(Dense(8, activation='tanh'))
@@ -37,7 +37,7 @@ df_straight_test = pd.read_csv('./data/csv/Biceps_curl_Straight_Test.csv')
 df_straight_test['target'] = TARGET_STRAIGHT
 df_bending_test = pd.read_csv('./data/csv/Biceps_curl_Bending_Test.csv')
 df_bending_test['target'] = TARGET_BENDING
-#有時候格式跑掉可以先去第一排+個字在重新run 我是在Score旁+一行
+#有時候格式跑掉可以先去第一排+個字在重新run 我是在Score旁+一行 會有這個原因是在csv第一行不應該有X,Y,score先+Target上去就會炸掉，後續要再處理
 X ,y = handleData([df_straight,df_bending,df_straight_test,df_bending_test])
 #test_size=0.2 -> training : test = 8 : 2
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=39)
@@ -57,9 +57,11 @@ model.compile(loss='categorical_crossentropy', optimizer="adam", metrics=['accur
 #開始訓練模型
 #X_train.shape (列,行)
 #train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=1500, verbose=0)
-train_history = model.fit(X_train, y_train, batch_size=20, validation_data=(X_test, y_test), epochs=5, verbose=0)
+train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=50, verbose=0)
 #顯示訓練結果
 score = model.evaluate(X_train, y_train)
 print ('Train Acc:', score[1])
 score = model.evaluate(X_test, y_test)
 print ('Test Acc:', score[1])
+
+model.save('./data/model/model_1')

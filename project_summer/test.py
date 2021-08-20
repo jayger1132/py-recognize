@@ -13,7 +13,22 @@ import sys
 from sys import platform
 import argparse
 import pandas
+import tensorflow as tf
+from tensorflow import keras
+##enviroment
+class MyArgs():
+    def __init__(self):
+        self.video_path = './data/video/3.mp4'
+        self.model = './data/model/model_1'
+args = MyArgs()
 
+# ==== [ load pre-train model ] ======================
+#graph = tf.Graph().as_default()
+#load model
+model = keras.models.load_model(args.model)
+model.predict(np.ones((1, 75)))
+
+dim = (720, 720)
 def detection(img):
     
     # Import Openpose (Windows/Ubuntu/OSX)
@@ -70,16 +85,40 @@ def detection(img):
 
     # Process Image
     datum = op.Datum()
-    
     datum.cvInputData = img
     opWrapper.emplaceAndPop(op.VectorDatum([datum]))
+
+    # 將節點放入陣列中,可以在這裡做節點的處理
+    tmp_data = []
+    for i in range(0,25,1):
+        tmp_data.append({ 'x': str(datum.poseKeypoints[0][i][0]), 'y': str(datum.poseKeypoints[0][i][1]), 'score': str(datum.poseKeypoints[0][i][2])})
+        #print(str(datum.poseKeypoints[0][i][0]),str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2]))
+    df = pd.DataFrame(tmp_data)
+    print(df.values)
+    data = np.array(df.values)
+    data = data.reshape((1, 75))
+    #print(data)
     cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", datum.cvOutputData)
     cv2.waitKey(0)
+    #預測
+    with tf.Graph().as_default():
+        model = keras.models.Sequential()
+        model.call = tf.function(model.call)
+        #model.predict_classes(test)預測輸出的是類別 ，model.predict(test) 預測輸出的是數值
+        res = model.predict_classes(data)
+        print("=3==3=3=3=3===============3=3=33",res)
+        if res[0] == 0:
+            print('Bending------------')
+            return (0, img)
+        elif res[0] == 1:
+            print('Straight-------------')
+            return (1, img)
+    print(df.iloc[:,:])
+    return(3,img)
+    
 
-video_path = './data/video/3.mp4'
-dim = (720, 720)
 
-cap = cv2.VideoCapture(video_path)
+cap = cv2.VideoCapture(args.video_path)
 # ret為T/F 代表有沒有讀到圖片 frame 是一偵
 #ret, frame = cap.read()
 ret, img = cap.read()
@@ -91,10 +130,13 @@ print('Videofps',video_fps)
 print(video_size)
 
 start_handle_time = time.time()
-
-img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
-## 模糊可能還要測試 越高辨識率會變差，越低誤判率會變高 要找合適的中間值
-img = cv2.GaussianBlur(img, (7,7), 0)
-
-detection(img)
-cv2.waitKey(0)
+while ret :
+    ret, img = cap.read()
+    img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
+    ## 模糊可能還要測試 越高辨識率會變差，越低誤判率會變高 要找合適的中間值
+    img = cv2.GaussianBlur(img, (7,7), 0)
+    ## 檢測
+    (is_okay,img2)=detection(img)
+    print(is_okay,"===============================================")
+#處理 Calling Model.predict in graph mode is not supported when the Model instance was constructed with eager mode enabled
+#https://www.codeleading.com/article/42675321680/ 

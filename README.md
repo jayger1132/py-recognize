@@ -24,6 +24,15 @@ with open('./data/csv/Biceps_curl.csv', 'a+', newline='') as csvfile:
         writer.writerow([str(datum.poseKeypoints[0][i][0]),str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])])
     writer.writerow(["","",""])
 ```
+#### 陣列extend V.S. append
+```py
+tmp_data=[]
+# range(0,25) => 0~24
+for i in range(0,25):
+    #extend 是[0],[1],[2]這樣+ append是[012],[012],[012]的+
+    tmp_data.extend(['x','y','score'])
+#print(tmp_data)
+```
 #### parser
 ```py
 # Flags
@@ -76,7 +85,24 @@ d = pd.concat(datas,axis=0)
 #分出train,test。test_size=0.2 -> training : test = 8 : 2。random_state=None和random_state=0是不一樣的，若為None時，劃分出來的測試集或訓練集中，其類標籤的比例也是隨機的。random_state 隨機數的種子，種子相同就算例子不同也會產生相同的隨機數
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=39)
 ```
-
+#### 寫enviromet的方式可以參考
+```py
+##enviroment
+class MyArgs():
+    def __init__(self):
+        self.video_path = './data/video/3.mp4'
+        self.model = './data/model/model_1'
+args = MyArgs()
+```
+#### 使用訓練模型
+```py
+#處理 Calling Model.predict in graph mode is not supported when the Model instance was constructed with eager mode enabled
+#https://www.codeleading.com/article/42675321680/ 
+#model.predict_classes(test)預測輸出的是類別 ，model.predict(test) 預測輸出的是數值
+model = keras.models.Sequential()
+model.call = tf.function(model.call)
+res = model.predict_classes(data)
+```
 ##### 參考資料
 ##### https://www.runoob.com/python/python-func-open.html
 ##### https://www.huaweicloud.com/articles/5b5c98238d126a90ca6d963e06cc9c06.html
