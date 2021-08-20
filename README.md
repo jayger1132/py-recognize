@@ -107,3 +107,7 @@ res = model.predict_classes(data)
 ##### https://www.runoob.com/python/python-func-open.html
 ##### https://www.huaweicloud.com/articles/5b5c98238d126a90ca6d963e06cc9c06.html
 ##### https://leemeng.tw/practical-pandas-tutorial-for-aspiring-data-scientists.html
+#### 模型使用
+##### https://kknews.cc/zh-tw/code/6lvzmaq.html
+##### https://ithelp.ithome.com.tw/articles/10197257
+##### https://keras-cn.readthedocs.io/en/latest/models/model/
