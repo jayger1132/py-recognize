@@ -9,9 +9,9 @@ from sys import platform
 import argparse
 import pandas
 #enviroment
-csv_path = "./data/csv/Biceps_curl_Straight.csv"
+csv_path = "./data/csv/Biceps_curl_Bending.csv"
 parser = argparse.ArgumentParser()
-parser.add_argument("--image_dir", default="./data/imgs/from_video/Biceps_curl/Straight/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_dir", default="./data/imgs/from_video/Biceps_curl/Bending/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 #def write_csv()
 try:
     # Import Openpose (Windows/Ubuntu/OSX)
@@ -83,7 +83,7 @@ try:
             tmp_data=[]
             for i in range(0,25):
                 #extend 是[0],[1],[2]這樣+ append是[012],[012],[012]的+
-                tmp_data.extend(['x','y','score'])
+                tmp_data.extend(['x'+str(i),'y'+str(i),'score'+str(i)])
             #print(tmp_data)
             # 寫入一列資料
             writer.writerow(tmp_data)
