@@ -19,6 +19,7 @@ def handleData(datas):
     return (tx,ty)
 def build_model_1():
     model = Sequential()
+    model.add(Dense(64, input_shape=(75, ), activation='tanh'))
     model.add(Dense(32, activation='tanh'))
     model.add(Dense(16, activation='tanh'))
     model.add(Dense(8, activation='tanh'))

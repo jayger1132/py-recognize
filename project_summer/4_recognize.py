@@ -20,10 +20,6 @@ class MyArgs():
         self.video_path = './data/video/1.mp4'
         self.model = './data/model/model_1'
 args = MyArgs()
-# ==== [ load pre-train model ] ======================
-#graph = tf.Graph().as_default()
-model = keras.models.Sequential()
-model.call = tf.function(model.call)
 dim = (720, 720)
 
 # Import Openpose (Windows/Ubuntu/OSX)
@@ -96,8 +92,8 @@ def detection(img):
     data = np.array(df.values)
     data = data.reshape((1, 75))
     #print(data)
-    cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", datum.cvOutputData)
-    cv2.waitKey(0)
+    #cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", datum.cvOutputData)
+    img2=datum.cvOutputData
     #預測
     with tf.Graph().as_default():
         #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#
@@ -111,12 +107,12 @@ def detection(img):
         print("=================",rest[0])
         if rest[0] == 0:
             print('Bending------------')
-            return (0, img)
+            return (0, img2)
         elif rest[0] == 1:
             print('Straight-------------')
-            return (1, img)
+            return (1, img2)
     #print(df.iloc[:,:])
-    return(3,rest[0])
+    return(3,img2)
     
 cap = cv2.VideoCapture(args.video_path)
 # ret為T/F 代表有沒有讀到圖片 frame 是一偵
@@ -130,8 +126,13 @@ print('Videofps',video_fps)
 print(video_size)
 
 start_handle_time = time.time()
+count =-1
 while ret :
+    
     ret, img = cap.read()
+    count += 1
+    if (count % 10) !=0:
+        continue
     if ret == True:
         img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
         ## 模糊可能還要測試 越高辨識率會變差，越低誤判率會變高 要找合適的中間值
@@ -139,7 +140,8 @@ while ret :
         ## 檢測
         (is_okay,target2)=detection(img)
         print(is_okay,"===============================================")
-        
+        cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target2)
+        cv2.waitKey(100)
     else :
         break
 

@@ -97,10 +97,12 @@ args = MyArgs()
 #### 使用訓練模型
 ```py
 #處理 Calling Model.predict in graph mode is not supported when the Model instance was constructed with eager mode enabled
+
 #https://www.codeleading.com/article/42675321680/ 
 #像是重新設定一次所以後面需要再重新load
 model = keras.models.Sequential()
 model.call = tf.function(model.call)
+#08/24 發現根本不需要上述這兩行 一開始出錯只是因為沒有load進去
 model = keras.models.load_model(args.model)
 model.predict(np.ones((1, 75)))
 #model.predict_classes(test)預測輸出的是類別 ，model.predict(test) 預測輸出的是數值
