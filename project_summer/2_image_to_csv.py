@@ -93,8 +93,14 @@ try:
         imageToProcess = cv2.imread(imagePath)
         datum.cvInputData = imageToProcess
         opWrapper.emplaceAndPop(op.VectorDatum([datum]))
-        print(str(datum.poseKeypoints))
+        #print(str(datum.poseKeypoints))
 
+        video_size = (imageToProcess.shape[1],imageToProcess.shape[0])
+        offsetneck = ((float(str(datum.poseKeypoints[0][0][1])))-(imageToProcess.shape[1]/2) )
+        
+        print(offsetneck)
+        
+        
         #write csv
         # 'a+' 是附加在後面 'a'是在前面
         with open(csv_path, 'a+', newline='') as csvfile:
@@ -102,13 +108,24 @@ try:
             writer = csv.writer(csvfile)
             # 寫入另外幾列資料
             data = [] #儲存成一列(橫排)
+            temp = (0,0,0)
             # range(0,25) => 0~24
             for i in range(0,25):
-                data.extend([str(datum.poseKeypoints[0][i][0]),str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])])
-                #print(data)
+                # 不去偏移neck
+                if i!=1 :
+                    if float(str(datum.poseKeypoints[0][i][0]))!=0.0:
+                        temp = [float(str(datum.poseKeypoints[0][i][0]))+offsetneck,str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])]
+                    # 如果x值為0代表沒有抓到點
+                    else :
+                        temp = [str(datum.poseKeypoints[0][i][0]),str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])]
+                #neck
+                else :
+                    temp = [imageToProcess.shape[1]/2,str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])]
+                data.extend(temp)
+                print(data)
             writer.writerow(data)
             
-            #writer.writerow(["","",""]) #nan
+        #    #writer.writerow(["","",""]) #nan
 
         if not args[0].no_display:
             cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", datum.cvOutputData)
