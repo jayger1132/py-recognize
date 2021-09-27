@@ -57,7 +57,7 @@ model.compile(loss='categorical_crossentropy', optimizer="adam", metrics=['accur
 #開始訓練模型
 #X_train.shape (列,行)
 #train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=1500, verbose=0)
-train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=50, verbose=0)
+train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=100, verbose=0)
 #顯示訓練結果
 score = model.evaluate(X_train, y_train)
 print ('Train Acc:', score[1])

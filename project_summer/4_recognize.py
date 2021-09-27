@@ -17,7 +17,7 @@ import tensorflow as tf
 from tensorflow import keras
 class MyArgs():
     def __init__(self):
-        self.video_path = './data/video/1.mp4'
+        self.video_path = './data/video/6.mp4'
         self.model = './data/model/model_1'
 args = MyArgs()
 dim = (720, 720)

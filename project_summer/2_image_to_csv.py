@@ -9,9 +9,9 @@ from sys import platform
 import argparse
 import pandas
 #enviroment
-csv_path = "./data/csv/Biceps_curl_Bending.csv"
+csv_path = "./data/csv/Crunch/Crunch_new.csv"
 parser = argparse.ArgumentParser()
-parser.add_argument("--image_dir", default="./data/imgs/from_video/Biceps_curl/Bending/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_dir", default="./data/imgs/from_video/Crunch/new", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 #def write_csv()
 try:
     # Import Openpose (Windows/Ubuntu/OSX)
@@ -97,7 +97,7 @@ try:
 
         video_size = (imageToProcess.shape[1],imageToProcess.shape[0])
         offsetneck = ((float(str(datum.poseKeypoints[0][0][1])))-(imageToProcess.shape[1]/2) )
-        
+        print(video_size)
         print(offsetneck)
         
         
@@ -122,7 +122,7 @@ try:
                 else :
                     temp = [imageToProcess.shape[1]/2,str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])]
                 data.extend(temp)
-                print(data)
+                #print(data)
             writer.writerow(data)
             
         #    #writer.writerow(["","",""]) #nan

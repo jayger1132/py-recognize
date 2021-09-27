@@ -48,7 +48,7 @@ def convertVideoToImage(video_paths, save_title, save_root=None, crop_size=None)
     subDir = ''
     count = -1
     img_count = 0
-    subDir_flag = True
+    #subDir_flag = True
     
     for video_path in video_paths:
         
@@ -62,11 +62,11 @@ def convertVideoToImage(video_paths, save_title, save_root=None, crop_size=None)
             if count % fps_fix != 0:
                 continue
 
-            if img_count % 100 == 0 and subDir_flag:
-                subDir = '/img_' + str(img_count) + '-' + str(img_count + 99)
-                if not os.path.exists(save_path + subDir):
-                    os.mkdir(save_path + subDir)
-                    subDir_flag = False
+            #if img_count % 100 == 0 and subDir_flag:
+            #    subDir = '/img_' + str(img_count) + '-' + str(img_count + 99)
+            #    if not os.path.exists(save_path + subDir):
+            #        os.mkdir(save_path + subDir)
+            #        subDir_flag = False
 
             if not start_flag:
                 if image is None:
@@ -97,7 +97,7 @@ def convertVideoToImage(video_paths, save_title, save_root=None, crop_size=None)
                     print('save image at: ' + _path)
                     cv2.imwrite(_path, image)
                     img_count = img_count + 1
-                    subDir_flag = True
+                    #subDir_flag = True
                     pre_frame = image
             else:
                 print('frame is empty...')
@@ -108,5 +108,5 @@ def convertVideoToImage(video_paths, save_title, save_root=None, crop_size=None)
     print('Number of images: %d/%d' % (img_count, math.floor(count / fps_fix) + 1))
     cv2.destroyAllWindows()
 
-paths = ['./data/video/5.mp4', './data/video/6.mp4']
-convertVideoToImage(paths, '/Biceps_curl')
+paths = ['./data/video/Crunch/3.mp4', './data/video/Crunch/4.mp4']
+convertVideoToImage(paths, '/Crunch')
