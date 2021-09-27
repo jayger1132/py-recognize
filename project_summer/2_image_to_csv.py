@@ -9,9 +9,9 @@ from sys import platform
 import argparse
 import pandas
 #enviroment
-csv_path = "./data/csv/Crunch/Crunch_new.csv"
+csv_path = "./data/csv/Crunch/Crunch_Underknee.csv"
 parser = argparse.ArgumentParser()
-parser.add_argument("--image_dir", default="./data/imgs/from_video/Crunch/new", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_dir", default="./data/imgs/from_video/Crunch/Underknee", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 #def write_csv()
 try:
     # Import Openpose (Windows/Ubuntu/OSX)
@@ -94,10 +94,19 @@ try:
         datum.cvInputData = imageToProcess
         opWrapper.emplaceAndPop(op.VectorDatum([datum]))
         #print(str(datum.poseKeypoints))
-
-        video_size = (imageToProcess.shape[1],imageToProcess.shape[0])
-        offsetneck = ((float(str(datum.poseKeypoints[0][0][1])))-(imageToProcess.shape[1]/2) )
-        print(video_size)
+        #要先判斷圖片是否判斷得出來 會有None的問題
+        if datum.poseKeypoints is None:
+            print(str(imagePath),"Noneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+            try:
+                os.remove(imagePath)
+                continue
+            except OSError as e:
+                print(e)
+        else :
+            print(imagePath)
+        #video_size = (imageToProcess.shape[1],imageToProcess.shape[0])
+        offsetneck = datum.poseKeypoints[0][0][1]-(imageToProcess.shape[1]/2) 
+        #print(video_size)
         print(offsetneck)
         
         
@@ -114,7 +123,7 @@ try:
                 # 不去偏移neck
                 if i!=1 :
                     if float(str(datum.poseKeypoints[0][i][0]))!=0.0:
-                        temp = [float(str(datum.poseKeypoints[0][i][0]))+offsetneck,str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])]
+                        temp = [datum.poseKeypoints[0][i][0]+offsetneck,str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])]
                     # 如果x值為0代表沒有抓到點
                     else :
                         temp = [str(datum.poseKeypoints[0][i][0]),str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])]

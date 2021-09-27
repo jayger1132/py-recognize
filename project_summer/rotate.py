@@ -1,7 +1,7 @@
 import cv2
 import os
 
-path='./data/imgs/from_video/Crunch\\Underknee'
+path='./data/imgs/from_video/Crunch\\new'
 files=os.listdir(path)
 
 p = 0

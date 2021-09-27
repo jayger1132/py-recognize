@@ -60,6 +60,23 @@ for imagePath in imagePaths:
     opWrapper.emplaceAndPop(op.VectorDatum([datum]))
     print(str(datum.poseKeypoints))
 ```
+#### openpose辨識有可能會出現None的問題
+```py
+imageToProcess = cv2.imread(imagePath)
+datum.cvInputData = imageToProcess
+opWrapper.emplaceAndPop(op.VectorDatum([datum]))
+#print(str(datum.poseKeypoints))
+#要先判斷圖片是否判斷得出來 會有None的問題
+if datum.poseKeypoints is None:
+    print(str(imagePath),"Noneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+    try:
+        os.remove(imagePath)
+        continue
+    except OSError as e:
+        print(e)
+else :
+    print(imagePath)
+```
 #### DF用法 , loc/iloc 差在iloc通常都是用數字(index去取資料) loc是用"name"
 ```py
 X=pd.DataFrame(data,columns=data.columns[:-1])
@@ -107,6 +124,18 @@ model = keras.models.load_model(args.model)
 model.predict(np.ones((1, 75)))
 #model.predict_classes(test)預測輸出的是類別 ，model.predict(test) 預測輸出的是數值
 res = model.predict_classes(data)
+```
+#### 躺著的動作需要旋轉讓他是立著的狀態openpose比較好判斷
+```py
+def Rotate(img):
+    
+    h = img.shape[0]
+    w = img.shape[1]
+    center = (h/2,w/2)
+    #rotate 旋轉中心座標 , "90"為逆時針90度, "-90"為順時針90度, 1為縮放1倍
+    R = cv2.getRotationMatrix2D(center,-90,1)
+    rotate = cv2.warpAffine(img,R,(w,h))
+    return rotate
 ```
 ##### 參考資料
 ##### https://www.runoob.com/python/python-func-open.html
