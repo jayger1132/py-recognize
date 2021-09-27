@@ -1,3 +1,4 @@
+
 import argparse
 import time
 import os
@@ -17,8 +18,8 @@ import tensorflow as tf
 from tensorflow import keras
 class MyArgs():
     def __init__(self):
-        self.video_path = './data/video/Biceps_curl/6.mp4'
-        self.model = './data/model/model_Biceps_curl'
+        self.video_path = './data/video/Crunch/4.mp4'
+        self.model = './data/model/model_Crunch'
 args = MyArgs()
 dim = (720, 720)
 
@@ -80,7 +81,9 @@ def detection(img):
     datum = op.Datum()
     datum.cvInputData = img
     opWrapper.emplaceAndPop(op.VectorDatum([datum]))
-
+    if datum.poseKeypoints is None:
+            print("Noneeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+            return(4,img)
     # 將節點放入陣列中,可以在這裡做節點的處理
     tmp_data = []
     target = []
@@ -106,11 +109,14 @@ def detection(img):
         rest = model.predict_classes(data,verbose=0)
         print("=================",rest[0])
         if rest[0] == 0:
-            print('Bending------------')
+            print('Straight------------')
             return (0, img2)
         elif rest[0] == 1:
-            print('Straight-------------')
+            print('90-------------')
             return (1, img2)
+        elif rest[0] == 2:
+            print('Underknee-------------')
+            return (2, img2)
     #print(df.iloc[:,:])
     return(3,img2)
     
@@ -137,17 +143,17 @@ while ret :
         img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
         ## 模糊可能還要測試 越高辨識率會變差，越低誤判率會變高 要找合適的中間值
         img = cv2.GaussianBlur(img, (7,7), 0)
+        #旋轉
+        h = dim[0]
+        w = dim[1]
+        center = (h/2,w/2)
+        #rotate 旋轉中心座標 , "90"為逆時針90度, "-90"為順時針90度, 1為縮放1倍
+        R = cv2.getRotationMatrix2D(center,-90,1)
+        rotate = cv2.warpAffine(img,R,(w,h))
         ## 檢測
-        (is_okay,target2)=detection(img)
+        (is_okay,target2)=detection(rotate)
         print(is_okay,"===============================================")
         cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target2)
         cv2.waitKey(100)
     else :
         break
-
-
-
-
-
-#處理 Calling Model.predict in graph mode is not supported when the Model instance was constructed with eager mode enabled
-#https://www.codeleading.com/article/42675321680/ 
