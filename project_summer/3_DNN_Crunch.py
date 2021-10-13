@@ -20,6 +20,7 @@ def handleData(datas):
     return (tx,ty)
 def build_model_1():
     model = Sequential()
+    # 全連階層(Dense)
     model.add(Dense(64, input_shape=(75, ), activation='tanh'))
     model.add(Dense(32, activation='tanh'))
     model.add(Dense(16, activation='tanh'))
@@ -58,16 +59,18 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 model = build_model_1()
 model.summary()
+# 使用categorical_crossentropy損失時，目標值應該是分類格式假設分為3，那就是3維的向量，除了表示類別index為1其他都為0
 model.compile(loss='categorical_crossentropy', optimizer="adam", metrics=['accuracy'])
 
 #開始訓練模型
 #X_train.shape (列,行)
 #train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=1500, verbose=0)
-train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=100, verbose=0)
+#verbose=2 為每個epoch輸出一行記錄 =1顯示進度條
+train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=1000, verbose=1)
 #顯示訓練結果
 score = model.evaluate(X_train, y_train)
-print ('Train Acc:', score[1])
+print ('Train Acc:', score[1] ,'Loss :' , score[0])
 score = model.evaluate(X_test, y_test)
-print ('Test Acc:', score[1])
+print ('Test Acc:', score[1], 'Loss :' , score[0])
 
 model.save('./data/model/model_Crunch')

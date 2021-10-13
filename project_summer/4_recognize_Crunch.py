@@ -106,17 +106,19 @@ def detection(img):
         #reshap[1,1,1,...~75個]
         model.predict(np.ones((1, 75)))
         #model.predict_classes(test)預測的是類別 ，model.predict(test) 預測的是數值
-        rest = model.predict_classes(data,verbose=0)
-        print("=================",rest[0])
-        if rest[0] == 0:
-            print('Straight------------')
-            return (0, img2)
-        elif rest[0] == 1:
-            print('90-------------')
-            return (1, img2)
-        elif rest[0] == 2:
-            print('Underknee-------------')
-            return (2, img2)
+        rest = model.predict(data,verbose=1)
+        print(rest)
+        #rest = model.predict_classes(data,verbose=0)
+        #print("=================",rest[0])
+        #if rest[0] == 0:
+        #    print('Straight------------')
+        #    return (0, img2)
+        #elif rest[0] == 1:
+        #    print('90-------------')
+        #    return (1, img2)
+        #elif rest[0] == 2:
+        #    print('Underknee-------------')
+        #    return (2, img2)
     #print(df.iloc[:,:])
     return(3,img2)
     
