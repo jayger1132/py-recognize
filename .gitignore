@@ -1,5 +1,6 @@
 data/
-project_summer/models/
+models/
 bin/
 python/
 x64/
+.vs/

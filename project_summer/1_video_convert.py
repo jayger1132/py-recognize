@@ -108,5 +108,5 @@ def convertVideoToImage(video_paths, save_title, save_root=None, crop_size=None)
     print('Number of images: %d/%d' % (img_count, math.floor(count / fps_fix) + 1))
     cv2.destroyAllWindows()
 
-paths = ['./data/video/Crunch/3.mp4', './data/video/Crunch/4.mp4']
-convertVideoToImage(paths, '/Crunch')
+paths = ['./data/video/1.mp4']
+convertVideoToImage(paths, '/hard')

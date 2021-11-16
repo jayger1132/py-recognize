@@ -9,9 +9,9 @@ from sys import platform
 import argparse
 import pandas
 #enviroment
-csv_path = "./data/csv/Crunch/Crunch_Underknee.csv"
+csv_path = "./data/csv/Biceps_curl/AVG/Biceps_curl4.csv"
 parser = argparse.ArgumentParser()
-parser.add_argument("--image_dir", default="./data/imgs/from_video/Crunch/Underknee", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_dir", default="./data/imgs/from_video/Biceps_curl/Biceps_curl4", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 #def write_csv()
 try:
     # Import Openpose (Windows/Ubuntu/OSX)
@@ -42,7 +42,9 @@ try:
 
     # Flags
     #parser = argparse.ArgumentParser()
-    #parser.add_argument("--image_dir", default="./data/imgs/from_video/Biceps_curl/straight_test/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+    #parser.add_argument("--image_dir",
+    #default="./data/imgs/from_video/Biceps_curl/straight_test/", help="Process
+    #a directory of images.  Read all standard formats (jpg, png, bmp, etc.).")
     parser.add_argument("--no_display", default=False, help="Enable to disable the visual display.")
     #parse_known_args()使用時機是argument不只有一個，當命令中傳入之後才會用到的選項時不會報錯而是先存起來保留到之後使用
     args = parser.parse_known_args()
@@ -73,17 +75,17 @@ try:
     opWrapper.start()
 
     # Read frames on directory
-    imagePaths = op.get_images_on_directory(args[0].image_dir);
+    imagePaths = op.get_images_on_directory(args[0].image_dir)
     start = time.time()
     print("Body keypoints: \n")
     
     with open(csv_path, 'w', newline='') as csvfile:
             # 建立 CSV 檔寫入器
             writer = csv.writer(csvfile)
-            tmp_data=[]
+            tmp_data = []
             for i in range(0,25):
                 #extend 是[0],[1],[2]這樣+ append是[012],[012],[012]的+
-                tmp_data.extend(['x'+str(i),'y'+str(i),'score'+str(i)])
+                tmp_data.extend(['x' + str(i),'y' + str(i),'score' + str(i)])
             #print(tmp_data)
             # 寫入一列資料
             writer.writerow(tmp_data)
@@ -105,9 +107,10 @@ try:
         else :
             print(imagePath)
         #video_size = (imageToProcess.shape[1],imageToProcess.shape[0])
-        offsetneck = datum.poseKeypoints[0][0][1]-(imageToProcess.shape[1]/2) 
-        #print(video_size)
-        print(offsetneck)
+        #偏移量 normorlize
+        print("neck: ",datum.poseKeypoints[0][1][0]," imgsize: ",imageToProcess.shape)
+        offsetneck = datum.poseKeypoints[0][1][0] - (imageToProcess.shape[1] / 2) 
+        print("offsetneck: ",offsetneck)
         
         
         #write csv
@@ -121,17 +124,21 @@ try:
             # range(0,25) => 0~24
             for i in range(0,25):
                 # 不去偏移neck
-                if i!=1 :
-                    if float(str(datum.poseKeypoints[0][i][0]))!=0.0:
-                        temp = [datum.poseKeypoints[0][i][0]+offsetneck,str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])]
+                if i != 1 :
+                    if float(str(datum.poseKeypoints[0][i][0])) != 0.0:
+                        print(datum.poseKeypoints[0][i][0])
+                        temp = [datum.poseKeypoints[0][i][0] - offsetneck,str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])]
+                        print(temp)
                     # 如果x值為0代表沒有抓到點
                     else :
                         temp = [str(datum.poseKeypoints[0][i][0]),str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])]
                 #neck
                 else :
-                    temp = [imageToProcess.shape[1]/2,str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])]
+                    temp = [imageToProcess.shape[1] / 2,str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2])]
+                
                 data.extend(temp)
                 #print(data)
+            
             writer.writerow(data)
             
         #    #writer.writerow(["","",""]) #nan
