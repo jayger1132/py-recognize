@@ -10,9 +10,10 @@ import argparse
 import pandas
 #enviroment
 parser = argparse.ArgumentParser()
-csv_path = "./data/csv/Split_squatL/AVG/Split_squatL4.csv"
+csv_path = "./data/csv/Split_squatL/Split_squatL_Start.csv"
+A = [0,1,2,5,8,9,10,11,12,13]
 #圖片位置
-parser.add_argument("--image_dir", default="./data/imgs/from_video/Split_squatL/AVG4", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_dir", default="./data/imgs/from_video/Split_squatL/DNN_Start", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 #def write_csv()
 try:
     # Import Openpose (Windows/Ubuntu/OSX)
@@ -84,7 +85,7 @@ try:
             # 建立 CSV 檔寫入器
             writer = csv.writer(csvfile)
             tmp_data = []
-            for i in range(0,25):
+            for i in A:
                 #extend 是[0],[1],[2]這樣+ append是[012],[012],[012]的+
                 tmp_data.extend(['x' + str(i),'y' + str(i),'score' + str(i)])
             #print(tmp_data)
@@ -123,7 +124,7 @@ try:
             data = [] #儲存成一列(橫排)
             temp = (0,0,0)
             # range(0,25) => 0~24
-            for i in range(0,25):
+            for i in A:
                 # 不去偏移neck
                 if i != 1 :
                     if float(str(datum.poseKeypoints[0][i][0])) != 0.0:
@@ -163,3 +164,4 @@ try:
 except Exception as e:
     print(e)
     sys.exit(0)
+

@@ -3,36 +3,85 @@ import csv
 import pandas as pd
 import numpy as np
 from os import walk
-path = "./data/csv/Biceps_curl/AVG"
-with open(path+"/AVG.csv", newline='') as csvfile:
-            # 以冒號分隔欄位，讀取檔案內容
-            rows = csv.reader(csvfile)
-            # 讀取 CSV 檔內容，將每一列轉成一個 dictionary
-            #rows = csv.DictReader(csvfile)
-            #用panda 知道csv的列數
-            df = pd.read_csv(path+"/AVG.csv")
-            #print (len(df))
-            column, row = 5, 25
 
+path = "./data/video/Split_squatL/L1"
+paths=[]
+imgpath = "./data/imgs/from_video/Split_squatL/"
+dir = "AVG1"
+name = "/split_squat"
+def convertVideoToImage(video_paths, save_title, save_root=None , img_path =None , crop_size = None):
+    start_time = time.time()
+    
+    if save_root is None:
+        save_root = save_title
+    save_path = img_path + save_root
+    if not os.path.exists(save_path):
+        os.mkdir(save_path)
+    fps_fix = 3 #fps15，fps_fix取3，一秒5張
+    dim = (720, 720)
+    # jpeg_flag = [int(cv2.IMWRITE_JPEG_QUALITY), 50]
+    diff_threshold = 0
+    
+    subDir = ''
+    count = -1
+    img_count = 0
+    #subDir_flag = True
+    
+    for video_path in video_paths:
+        
+        cam = cv2.VideoCapture(video_path)
+        start_flag = False
+        ret_val = True
+        pre_frame = None
+        while ret_val:
+            ret_val, image = cam.read()
+            count = count + 1
+            if count % fps_fix != 0:
+                continue
 
-            Ax = np.zeros((column,row))
-            Ay = np.zeros((column,row))
-            j=1
-            #將AVG 的x,y 值存入陣列中
-            for row in rows:
-                if row[0] == "x0" :
-                    continue
-                else:
-                    o=0
-                    for i in range (0,25):
-                        Ax[j][o] = row[2*i]
-                        #print(Ax[j][o])
-                        Ay[j][o] = row[2*i+1]
-                        #print(Ay[j][o])
-                        o+=1
-                    j=j+1
-           
-            print("1級",np.linalg.norm(Ax[1]-Ax[1]))
-            print("2級",np.linalg.norm(Ax[2]-Ay[2]))
-            print("3級",np.linalg.norm(Ax[3]-Ay[3]))
-            print("4級",np.linalg.norm(Ax[4]-Ay[4]))
+            #if img_count % 100 == 0 and subDir_flag:
+            #    subDir = '/img_' + str(img_count) + '-' + str(img_count + 99)
+            #    if not os.path.exists(save_path + subDir):
+            #        os.mkdir(save_path + subDir)
+            #        subDir_flag = False
+
+            if not start_flag:
+                if image is None:
+                    print("image \"%s\" is not exist" % video_path)
+                    break
+                print('video image: (%d, %d)' % (image.shape[1], image.shape[0]))
+                start_flag = True
+
+            if image is not None:
+                # 輸出放入的影片
+                cv2.imshow('test',image)
+                image = cv2.resize(image, dim, interpolation=cv2.INTER_AREA)
+                # image = cv2.GaussianBlur(image, (31, 31), 0)
+                # crop
+                if crop_size is not None:                
+                    (x1, y1, x2, y2) = crop_size
+                    if x2 is None:
+                        x2 = image.shape[1]
+                    if y2 is None:
+                        y2 = image.shape[0]
+                    # crop
+                    image = image[y1:y2, x1:x2]
+                if pre_frame is None or dHashDiff(image, pre_frame) > diff_threshold:
+                    # _path = (save_path + subDir + '/' + save_title +
+                    # '-%d.jpg') % img_count
+                    # cv2.imwrite(_path, image, jpeg_flag)
+                    _path = (save_path + subDir + save_title + '-%d.jpg') % img_count
+                    print('save image at: ' + _path)
+                    cv2.imwrite(_path, image)
+                    img_count = img_count + 1
+                    #subDir_flag = True
+                    pre_frame = image
+            else:
+                print('frame is empty...')
+
+            if cv2.waitKey(1) == 27:
+                break
+    print('Finish in %.4f secs.' % (time.time() - start_time))
+    print('Number of images: %d/%d' % (img_count, math.floor(count / fps_fix) + 1))
+    cv2.destroyAllWindows()
+convertVideoToImage(paths, name , dir , imgpath)

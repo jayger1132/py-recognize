@@ -18,7 +18,7 @@ import tensorflow as tf
 from tensorflow import keras
 class MyArgs():
     def __init__(self):
-        self.video_path = './data/video/Biceps_curl/complete/VID_20211123_160202.mp4'
+        self.video_path = './data/video/Biceps_curl/complete/1123.mp4'
         self.model = './data/model/model_Biceps_curl'
         self.path = "./data/csv/Biceps_curl/AVG"
         self.A = [0,1,2,3,4,5,6,7]
@@ -193,7 +193,8 @@ video_size = (img.shape[1], img.shape[0])
 
 start_handle_time = time.time()
 count = -1
-
+#計算時間點
+Time = 0
 Action_flag = 0
 Action_time = 0
 Out_put = { '等級一': 0 , '等級二': 0 , '等級三': 0 ,'等級四': 0 }

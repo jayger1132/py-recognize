@@ -5,6 +5,25 @@ import sys
 import os.path
 import time
 import math
+from os import walk
+# config
+path = "./data/video/Split_squatL/complete"
+paths=[]
+imgpath = "./data/imgs/from_video/Split_squatL/"
+dir = "Complete"
+name = "/complete"
+
+
+for root, dirs ,files in walk(path):
+    
+    #print("路徑：", root)
+    #print("  目錄：", dirs)
+    #print("  檔案：", files)
+    for file in files:
+        
+        paths.extend([path+'/'+str(file)])
+
+
 
 def toDHash(img):
     img = cv2.resize(img, (9, 8), interpolation=cv2.INTER_CUBIC)
@@ -32,22 +51,22 @@ def dHashDiff(i1, i2):
     h2 = toDHash(i2)
     return hDist(h1, h2)
 
-def convertVideoToImage(video_paths, save_title, save_root=None, crop_size=None):
+def convertVideoToImage(video_paths, save_title, save_root=None , img_path =None , crop_size = None):
     start_time = time.time()
     
     if save_root is None:
         save_root = save_title
-    save_path = './data/imgs/from_video' + save_root
+    save_path = img_path + save_root
     if not os.path.exists(save_path):
         os.mkdir(save_path)
     fps_fix = 3 #fps15，fps_fix取3，一秒5張
-    dim = (720, 720)
+    dim = (480, 720)
     # jpeg_flag = [int(cv2.IMWRITE_JPEG_QUALITY), 50]
     diff_threshold = 0
     
     subDir = ''
     count = -1
-    img_count = 0
+    img_count = 1
     #subDir_flag = True
     
     for video_path in video_paths:
@@ -108,5 +127,4 @@ def convertVideoToImage(video_paths, save_title, save_root=None, crop_size=None)
     print('Number of images: %d/%d' % (img_count, math.floor(count / fps_fix) + 1))
     cv2.destroyAllWindows()
 
-paths = ['./data/video/1.mp4']
-convertVideoToImage(paths, '/hard')
+convertVideoToImage(paths, name , dir , imgpath)

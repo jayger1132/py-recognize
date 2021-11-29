@@ -18,12 +18,12 @@ import tensorflow as tf
 from tensorflow import keras
 class MyArgs():
     def __init__(self):
-        self.video_path = './data/video/Biceps_curl/complete/VID_20211123_160202.mp4'
+        self.video_path = './data/video/Split_squatR/complete/VID_20211123_162504.mp4'
         self.model = './data/model/model_Biceps_curl'
-        self.path = "./data/csv/Biceps_curl/AVG"
-        self.A = [0,1,2,3,4,5,6,7]
+        self.path = "./data/csv/Split_squatR/AVG"
+        self.A = [0,1,2,5,8,9,10,12,13,14]
 args = MyArgs()
-dim = (480, 720)
+dim = (720, 720)
 
 # Import Openpose (Windows/Ubuntu/OSX)
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -52,8 +52,6 @@ except ImportError as e:
     raise e
 
 def detection(img):
-    video_size = (img.shape[1], img.shape[0])
-    print(video_size)
     params = dict()
     params["model_folder"] = "./models/"
 
@@ -87,7 +85,7 @@ def detection(img):
             tempX = (img.shape[1]) / 2
 
         tmp_data.append({ 'x': str(datum.poseKeypoints[0][i][0]), 'y': str(datum.poseKeypoints[0][i][1]), 'score': str(datum.poseKeypoints[0][i][2])})
-    #print(tmp_data)
+        
     #存AVG
     for i in args.A:
         if i != 1:
@@ -104,9 +102,10 @@ def detection(img):
 
         tmp_AVGx.extend([tempX])
         tmp_AVGy.extend([float(datum.poseKeypoints[0][i][1])])
-        
+        #print(str(datum.poseKeypoints[0][i][0]),str(datum.poseKeypoints[0][i][1]),str(datum.poseKeypoints[0][i][2]))
     #輸出AVG值
-    #print("AVGx :",tmp_AVGx,"\nAVGy :",tmp_AVGy)
+    #print("AVGx :",tmp_AVGx,"  AVGy :",tmp_AVGy)
+        
     df = pd.DataFrame(tmp_data)
     #print(df.values)
     data = np.array(df.values)
@@ -125,7 +124,7 @@ def detection(img):
             #用panda 知道csv的列數
             df = pd.read_csv(args.path + "/AVG.csv")
             #print (len(df))
-            column, row = 6, 8
+            column, row = 5, 10
             Ax = np.zeros((column,row))
             Ay = np.zeros((column,row))
             j = 1
@@ -142,43 +141,40 @@ def detection(img):
                         #print(Ay[j][o])
                         o+=1
                     j = j + 1
-            Score0 = np.array([np.linalg.norm(Ax[1] - tmp_AVGx),np.linalg.norm(Ay[1] - tmp_AVGy)])
-            Score1 = np.array([np.linalg.norm(Ax[2] - tmp_AVGx),np.linalg.norm(Ay[2] - tmp_AVGy)])
-            Score2 = np.array([np.linalg.norm(Ax[3] - tmp_AVGx),np.linalg.norm(Ay[3] - tmp_AVGy)])
-            Score3 = np.array([np.linalg.norm(Ax[4] - tmp_AVGx),np.linalg.norm(Ay[4] - tmp_AVGy)])
-            Score4 = np.array([np.linalg.norm(Ax[5] - tmp_AVGx),np.linalg.norm(Ay[5] - tmp_AVGy)])
-            #print(Score1,Score2,Score3,Score4)
+            
+            Score1 = np.array([np.linalg.norm(Ax[1] - tmp_AVGx),np.linalg.norm(Ay[1] - tmp_AVGy)])
+            Score2 = np.array([np.linalg.norm(Ax[2] - tmp_AVGx),np.linalg.norm(Ay[2] - tmp_AVGy)])
+            Score3 = np.array([np.linalg.norm(Ax[3] - tmp_AVGx),np.linalg.norm(Ay[3] - tmp_AVGy)])
+            Score4 = np.array([np.linalg.norm(Ax[4] - tmp_AVGx),np.linalg.norm(Ay[4] - tmp_AVGy)])
             #flag紀錄等級
             LV = 0
-            if(min(Score0[1],Score1[1],Score2[1],Score3[1],Score4[1])) == Score0[1]:
-                LV = 0
-            elif(min(Score0[1],Score1[1],Score2[1],Score3[1],Score4[1])) == Score1[1]:
+            if(min(Score1[1],Score2[1],Score3[1],Score4[1])) == Score1[1]:
                 LV = 1
-            elif(min(Score0[1],Score1[1],Score2[1],Score3[1],Score4[1])) == Score2[1]:
+            elif(min(Score1[1],Score2[1],Score3[1],Score4[1])) == Score2[1]:
                 LV = 2
-            elif(min(Score0[1],Score1[1],Score2[1],Score3[1],Score4[1])) == Score3[1]:
+            elif(min(Score1[1],Score2[1],Score3[1],Score4[1])) == Score3[1]:
                 LV = 3
-            elif(min(Score0[1],Score1[1],Score2[1],Score3[1],Score4[1])) == Score4[1]:
+            elif(min(Score1[1],Score2[1],Score3[1],Score4[1])) == Score4[1]:
                 LV = 4
     #預測
-    with tf.Graph().as_default():
-        #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        #每次都要load還需要再改#
-        #args = MyArgs()
-        model = keras.models.load_model(args.model)
-        #reshap[1,1,1,...~75個]
-        model.predict(np.ones((1, 75)))
-        #model.predict_classes(test)預測的是類別 ，model.predict(test) 預測的是數值
-        rest = model.predict_classes(data,verbose=0)
-        #print("=================",rest[0])
-        if rest[0] == 0:
-            #print('Bending------------')
-            return ('Ready', img2 ,LV )
-        elif rest[0] == 1:
-            #print('Straight-------------')
-            return ('Start', img2 , LV)
-    #print(df.iloc[:,:])
-    #return (img2 ,LV)
+    #with tf.Graph().as_default():
+    #    #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    #    #每次都要load還需要再改#
+    #    #args = MyArgs()
+    #    model = keras.models.load_model(args.model)
+    #    #reshap[1,1,1,...~75個]
+    #    model.predict(np.ones((1, 75)))
+    #    #model.predict_classes(test)預測的是類別 ，model.predict(test) 預測的是數值
+    #    rest = model.predict_classes(data,verbose=0)
+    #    #print("=================",rest[0])
+    #    if rest[0] == 0:
+    #        #print('Bending------------')
+    #        return ('Bending', img2 ,LV )
+    #    elif rest[0] == 1:
+    #        #print('Straight-------------')
+    #        return ('Straight', img2 , LV)
+    ##print(df.iloc[:,:])
+    return (img2 ,LV )
     
 cap = cv2.VideoCapture(args.video_path)
 # ret為T/F 代表有沒有讀到圖片 frame 是一偵
@@ -194,7 +190,9 @@ video_size = (img.shape[1], img.shape[0])
 start_handle_time = time.time()
 count = -1
 
-Action_flag = 0
+
+#計算時間點
+Time = 0
 Action_time = 0
 Out_put = { '等級一': 0 , '等級二': 0 , '等級三': 0 ,'等級四': 0 }
 while ret :
@@ -202,26 +200,20 @@ while ret :
     #計算幀數
     count += 1
     
-    #%6 => FPS 5
+    #%6 => 1幀0.20秒
     if (count % 6) != 0:
         continue
     if ret == True:
+        Time = Time+1
         img = cv2.resize(img, dim, interpolation=cv2.INTER_AREA)
         # 模糊可能還要測試 越高辨識率會變差，越低誤判率會變高 要找合適的中間值
         img = cv2.GaussianBlur(img, (7,7), 0)
         # 檢測
-        (Flag_action,target_out ,LV_out) = detection(img)
-
+        (target_out ,LV_out) = detection(img)
+        print("LV" , LV_out)
         #==============偵測是否開始運動================未完成===========
-        if(Flag_action == 'Ready'):
-            #計算時間點
-            Time = 0
-            if(Action_flag == 1):
-                Action_time += 1
-                Action_flag = 0
-        else:
-            Time += 1
-            if(Time>=7 and Time <=12 ):
+        if( Time%15 != 0):
+            if(Time>=6 and Time <=12 ):
                 if ( LV_out == 1):
                     Out_put['等級一']+=1
                 elif ( LV_out == 2):
@@ -230,17 +222,15 @@ while ret :
                     Out_put['等級三']+=1
                 elif ( LV_out == 4):
                     Out_put['等級四']+=1
-                Action_flag = 1
-        print("等級為 : ",LV_out)
-        print("各個等級 : ",Out_put)
-        print("狀態 : " , Flag_action)
-        print("Time : " , Time , "Action_time : " ,Action_time)
+        else:
+            Time=0
+            Action_time+=1
         #print(is_okay,"===============================================")
+        print(Out_put.items(),Action_time)
         cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target_out)
-        cv2.waitKey(100)
+        cv2.waitKey(0)
     else :
         break
-
 print(Out_put.items())
 if(max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級一'] ) :
     LV = 1
@@ -274,3 +264,4 @@ print('等級'+str(LV))
 
 #處理 Calling Model.predict in graph mode is not supported when the Model instance was constructed with eager mode enabled
 #https://www.codeleading.com/article/42675321680/ 
+

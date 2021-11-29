@@ -20,9 +20,7 @@ def handleData(datas):
 def build_model_1():
     model = Sequential()
     # 全連階層(Dense)
-    model.add(Dense(128, input_shape=(75, ), activation='relu'))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dense(32, activation='relu'))
+    model.add(Dense(32, input_shape=(30, ), activation='relu'))
     model.add(Dense(16, activation='relu'))
     model.add(Dense(8, activation='relu'))
     model.add(Dense(4, activation='relu'))
@@ -30,15 +28,15 @@ def build_model_1():
     model.add(Dense(TARGET_DIM, activation='softmax'))
     return model
 
-df_ready = pd.read_csv('./data/csv/Biceps_curl/Biceps_curl_Ready.csv')
+df_ready = pd.read_csv('./data/csv/Split_squatL/Split_squatL_Ready.csv')
 df_ready['target'] = TARGET_READY
-df_start = pd.read_csv('./data/csv/Biceps_curl/Biceps_curl_Start.csv')
+df_start = pd.read_csv('./data/csv/Split_squatL/Split_squatL_Start.csv')
 df_start['target'] = TARGET_START
 
 
-df_ready_test = pd.read_csv('./data/csv/Biceps_curl/Biceps_curl_Ready_Test.csv')
+df_ready_test = pd.read_csv('./data/csv/Split_squatL/Split_squatL_Ready_Test.csv')
 df_ready_test['target'] = TARGET_READY
-df_start_test = pd.read_csv('./data/csv/Biceps_curl/Biceps_curl_Start_Test.csv')
+df_start_test = pd.read_csv('./data/csv/Split_squatL/Split_squatL_Start_Test.csv')
 df_start_test['target'] = TARGET_START
 
 
@@ -71,4 +69,4 @@ print ('Train Acc:', score[1] ,'Loss :' , score[0])
 score = model.evaluate(X_test, y_test)
 print ('Test Acc:', score[1], 'Loss :' , score[0])
 
-model.save('./data/model/model_Biceps_curl')
+model.save('./data/model/model_Split_squatL2')
