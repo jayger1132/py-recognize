@@ -10,9 +10,9 @@ import argparse
 import pandas
 #enviroment
 parser = argparse.ArgumentParser()
-csv_path = "./data/csv/Split_squatL/AVG/Split_squatL4.csv"
+csv_path = "./data/csv/Split_squatL/Split_squatL_Start.csv"
 #圖片位置
-parser.add_argument("--image_dir", default="./data/imgs/from_video/Split_squatL/AVG4", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_dir", default="./data/imgs/from_video/Split_squatL/DNN_Start", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 #def write_csv()
 try:
     # Import Openpose (Windows/Ubuntu/OSX)

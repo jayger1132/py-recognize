@@ -10,8 +10,8 @@ from os import walk
 path = "./data/video/Split_squatL/complete"
 paths=[]
 imgpath = "./data/imgs/from_video/Split_squatL/"
-dir = "Complete"
-name = "/complete"
+dir = "complete"
+name = "/C"
 
 
 for root, dirs ,files in walk(path):

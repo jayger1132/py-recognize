@@ -1,3 +1,4 @@
+#做法較粗糙 判斷狀態
 import argparse
 import time
 import os
@@ -18,7 +19,7 @@ import tensorflow as tf
 from tensorflow import keras
 class MyArgs():
     def __init__(self):
-        self.video_path = './data/video/Biceps_curl/complete/1123.mp4'
+        self.video_path = './data/video/Biceps_curl/complete/VID_20211130_201924.mp4'
         self.model = './data/model/model_Biceps_curl'
         self.path = "./data/csv/Biceps_curl/AVG"
         self.A = [0,1,2,3,4,5,6,7]
@@ -53,7 +54,7 @@ except ImportError as e:
 
 def detection(img):
     video_size = (img.shape[1], img.shape[0])
-    print(video_size)
+    #print(video_size)
     params = dict()
     params["model_folder"] = "./models/"
 
@@ -147,18 +148,16 @@ def detection(img):
             Score2 = np.array([np.linalg.norm(Ax[3] - tmp_AVGx),np.linalg.norm(Ay[3] - tmp_AVGy)])
             Score3 = np.array([np.linalg.norm(Ax[4] - tmp_AVGx),np.linalg.norm(Ay[4] - tmp_AVGy)])
             Score4 = np.array([np.linalg.norm(Ax[5] - tmp_AVGx),np.linalg.norm(Ay[5] - tmp_AVGy)])
-            #print(Score1,Score2,Score3,Score4)
+            print(Score0,Score1,Score2,Score3,Score4)
             #flag紀錄等級
             LV = 0
-            if(min(Score0[1],Score1[1],Score2[1],Score3[1],Score4[1])) == Score0[1]:
-                LV = 0
-            elif(min(Score0[1],Score1[1],Score2[1],Score3[1],Score4[1])) == Score1[1]:
+            if(min(Score1[1],Score2[1],Score3[1],Score4[1])) == Score1[1]:
                 LV = 1
-            elif(min(Score0[1],Score1[1],Score2[1],Score3[1],Score4[1])) == Score2[1]:
+            elif(min(Score1[1],Score2[1],Score3[1],Score4[1])) == Score2[1]:
                 LV = 2
-            elif(min(Score0[1],Score1[1],Score2[1],Score3[1],Score4[1])) == Score3[1]:
+            elif(min(Score1[1],Score2[1],Score3[1],Score4[1])) == Score3[1]:
                 LV = 3
-            elif(min(Score0[1],Score1[1],Score2[1],Score3[1],Score4[1])) == Score4[1]:
+            elif(min(Score1[1],Score2[1],Score3[1],Score4[1])) == Score4[1]:
                 LV = 4
     #預測
     with tf.Graph().as_default():
@@ -186,17 +185,19 @@ cap = cv2.VideoCapture(args.video_path)
 ret, img = cap.read()
 # cv2.CAP_PROP_FPS 輸出影片FPS
 video_fps = cap.get(cv2.CAP_PROP_FPS)
-
+print(img)
 video_size = (img.shape[1], img.shape[0])
 #print('Videofps',video_fps)
 #print(video_size)
 
 start_handle_time = time.time()
 count = -1
-#計算時間點
+#計算張數
 Time = 0
+#計算動作次數
 Action_flag = 0
 Action_time = 0
+tempA = []
 Out_put = { '等級一': 0 , '等級二': 0 , '等級三': 0 ,'等級四': 0 }
 while ret :
     ret, img = cap.read()
@@ -215,13 +216,29 @@ while ret :
 
         #==============偵測是否開始運動================未完成===========
         if(Flag_action == 'Ready'):
-            #計算時間點
-            Time = 0
+            
             if(Action_flag == 1):
                 Action_time += 1
                 Action_flag = 0
+                #分數
+                Grade = 0
+                for i in range(0,len(tempA)) :
+                    if i<=len(tempA)/4:
+                        if(tempA[i]==1 or tempA[i]==2):
+                            Grade+=1
+                    elif i<=3*len(tempA)/4:
+                        if(tempA[i]==3 or tempA[i]==4):
+                            Grade+=1
+                    else:
+                        if(tempA[i]==1 or tempA[i]==2):
+                            Grade+=1
+                print("評分為",Grade/len(tempA)*100,"%")
+                #計算時間點
+                Time = 0
+                tempA = []
         else:
             Time += 1
+            tempA.extend([LV_out])
             if(Time>=7 and Time <=12 ):
                 if ( LV_out == 1):
                     Out_put['等級一']+=1
@@ -232,41 +249,48 @@ while ret :
                 elif ( LV_out == 4):
                     Out_put['等級四']+=1
                 Action_flag = 1
+        
         print("等級為 : ",LV_out)
         print("各個等級 : ",Out_put)
         print("狀態 : " , Flag_action)
         print("Time : " , Time , "Action_time : " ,Action_time)
+        print(tempA)
         #print(is_okay,"===============================================")
         cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target_out)
         cv2.waitKey(100)
     else :
         break
 
-print(Out_put.items())
-if(max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級一'] ) :
-    LV = 1
-elif (max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級二'] ):
-    LV = 2
-elif (max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級三'] ):
-    LV = 3
-elif (max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級四'] ):
-    LV = 4
-print('等級'+str(LV))
+#print(Out_put.items())
+#if(max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級一'] ) :
+#    LV = 1
+#elif (max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級二'] ):
+#    LV = 2
+#elif (max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級三'] ):
+#    LV = 3
+#elif (max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級四'] ):
+#    LV = 4
+#print('等級'+str(LV))
+
+
+#上傳資料
 #dbhost='justtry.406.csie.nuu.edu.tw'
 #dbuser='root'
 #dbport=33060
 #dbpass='nuuCSIE406'
-#dbname='account'
+#dbname='gordon'
 #try:
-#    db=pymysql.connect(host=dbhost,user=dbuser,port=dbport,password=dbpass,database=dbname)
+#    db = pymysql.connect(host=dbhost,user=dbuser,port=dbport,password=dbpass,database=dbname)
 #    print("連結成功")
 #    cursor = db.cursor()
 #except pymysql.Error as e:
 #    print("連線失敗"+str(e))
-#sql = "SELECT account , password , date FROM account WHERE account = '%s'" % (account)
+##sql = "SELECT * FROM Identify "
+#sql = "INSERT INTO Identify (exercise , grade , suggest ) VALUES ('二頭彎舉', %d ,'普通' ) " % (temp)
 #try:
 #    cursor.execute(sql)
-#    results = cursor.fetchone()
+#    db.commit()
+#    print("上傳成功")
 #except:
 #    db.rollback()
 

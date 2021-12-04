@@ -20,7 +20,9 @@ def handleData(datas):
 def build_model_1():
     model = Sequential()
     # 全連階層(Dense)
-    model.add(Dense(32, input_shape=(30, ), activation='relu'))
+    model.add(Dense(128, input_shape=(63, ), activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(32, activation='relu'))
     model.add(Dense(16, activation='relu'))
     model.add(Dense(8, activation='relu'))
     model.add(Dense(4, activation='relu'))
@@ -66,7 +68,14 @@ train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validat
 #顯示訓練結果
 score = model.evaluate(X_train, y_train)
 print ('Train Acc:', score[1] ,'Loss :' , score[0])
-score = model.evaluate(X_test, y_test)
-print ('Test Acc:', score[1], 'Loss :' , score[0])
+scoreT = model.evaluate(X_test, y_test)
+print ('Test Acc:', scoreT[1], 'Loss :' , scoreT[0])
 
-model.save('./data/model/model_Split_squatL2')
+while (score[0]>0.005 or scoreT[0]>0.005):
+    train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=1500, verbose=1)
+    score = model.evaluate(X_train, y_train)
+    print ('Train Acc:', score[1] ,'Loss :' , score[0])
+    scoreT = model.evaluate(X_test, y_test)
+    print ('Test Acc:', scoreT[1], 'Loss :' , scoreT[0])
+
+model.save('./data/model/model_Split_squatL')

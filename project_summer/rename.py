@@ -1,5 +1,5 @@
 import os
-path='./data/imgs/from_video/Split_squatL/AVG2' #這就是欲進行檔名更改的檔案路徑，路徑的斜線是為/，要留意下！
+path='./data/imgs/from_video/Split_squatL/Split_squatL173/Split_squatL1' #這就是欲進行檔名更改的檔案路徑，路徑的斜線是為/，要留意下！
 files=os.listdir(path)
 #print(files) #印出讀取到的檔名稱，用來確認自己是不是真的有讀到
 
@@ -11,7 +11,7 @@ for i in files :
     else:
         oldname=path+"/"+i
         print(oldname)
-        newname = path+'/'+str(p)+'_2.jpg'
+        newname = path+'/'+str(p)+'_173_1.jpg'
         print(newname)
         p = p+1
         os.renames(oldname, newname)
