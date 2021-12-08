@@ -137,6 +137,16 @@ def Rotate(img):
     rotate = cv2.warpAffine(img,R,(w,h))
     return rotate
 ```
+#### 用歐基里德距離分析影像相似度
+```py
+#Score0 表示與0的距離
+Score0 = math.pow(math.pow(np.linalg.norm(Ax[1] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[1] - tmp_AVGy),2),0.5)
+Score1 = math.pow(math.pow(np.linalg.norm(Ax[2] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[2] - tmp_AVGy),2),0.5)
+Score2 = math.pow(math.pow(np.linalg.norm(Ax[3] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[3] - tmp_AVGy),2),0.5)
+Score3 = math.pow(math.pow(np.linalg.norm(Ax[4] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[4] - tmp_AVGy),2),0.5)
+Score4 = math.pow(math.pow(np.linalg.norm(Ax[5] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[5] - tmp_AVGy),2),0.5)
+print("與等級0比較",Score0,"\n與等級1比較",Score1,"\n與等級2比較",Score2,"\n與等級3比較",Score3,"\n與等級4比較",Score4)
+```
 ##### 參考資料
 ##### https://www.runoob.com/python/python-func-open.html
 ##### https://www.huaweicloud.com/articles/5b5c98238d126a90ca6d963e06cc9c06.html
