@@ -1,5 +1,6 @@
 # Python圖像辨識專案
 [![Quality gate](https://sonarqube.210.mlc.app/api/project_badges/quality_gate?project=py-recognize-26)](https://sonarqube.210.mlc.app/dashboard?id=py-recognize-26)
+# 錄製影片時要注意攝影機是否有定位，我錄影的方式是確定攝影機的絕對位置，讓鏡頭下緣對齊地上規範的線
 
 ## 設定dir必須要以英文為主不然抓path很容易出問題
 #### 輸出放入的檔案 cv2.imshow('',img)
@@ -139,6 +140,8 @@ def Rotate(img):
 ```
 #### 用歐基里德距離分析影像相似度
 ```py
+# 先分析目前屬於哪個階段->判斷在該階段上還是下->在該階段下面時與起始點(改階段-1)做比較;反之
+
 #Score0 表示與0的距離
 Score0 = math.pow(math.pow(np.linalg.norm(Ax[1] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[1] - tmp_AVGy),2),0.5)
 Score1 = math.pow(math.pow(np.linalg.norm(Ax[2] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[2] - tmp_AVGy),2),0.5)
@@ -146,6 +149,57 @@ Score2 = math.pow(math.pow(np.linalg.norm(Ax[3] - tmp_AVGx),2)+math.pow(np.linal
 Score3 = math.pow(math.pow(np.linalg.norm(Ax[4] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[4] - tmp_AVGy),2),0.5)
 Score4 = math.pow(math.pow(np.linalg.norm(Ax[5] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[5] - tmp_AVGy),2),0.5)
 print("與等級0比較",Score0,"\n與等級1比較",Score1,"\n與等級2比較",Score2,"\n與等級3比較",Score3,"\n與等級4比較",Score4)
+```
+#### 二頭彎舉階段示意圖
+![image] (https://github.com/jayger1132/py-recognize/blob/main/img/%E4%BA%8C%E9%A0%AD%E5%BD%8E%E8%88%89%E9%9A%8E%E6%AE%B5%E5%9C%96.jpg)
+#### 運動過程解析圖
+![image] (https://github.com/jayger1132/py-recognize/blob/main/img/%E9%81%8B%E5%8B%95%E9%81%8E%E7%A8%8B%E5%88%86%E9%A1%9E%E5%9C%96.jpg)
+#### cv2作圖、編譯中文文字
+```py
+#Cv2輸出中文
+def cv2ImgAddText(img, text, left, top, textColor=(0, 255, 0), textSize=20):
+    if (isinstance(img, np.ndarray)):  #判斷是否OpenCV圖片類型
+        img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    draw = ImageDraw.Draw(img)
+    fontText = ImageFont.truetype(
+        "font/simsun.ttc", textSize, encoding="utf-8")
+    draw.text((left, top), text, textColor, font=fontText)
+    return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
+if(Flag_action == "Ready" ):
+    cv2.rectangle(target_out, (350, 10), (470, 60), (255, 255, 255), -1)
+    cv2.putText(target_out, 'Pause', (360, 45), 4, 1, (255, 0, 0), 1, cv2.LINE_AA)
+    
+else :
+    
+    cv2.rectangle(target_out, (350, 10), (470, 90), (255, 255, 255), -1)
+    target_out=cv2ImgAddText(target_out, "階段 "+str(LV_out), 360, 15, (255, 0, 0), 35)
+    target_out=cv2ImgAddText(target_out, "分數 "+str(Text1), 360, 50, (255, 0, 0), 35)
+#target_out=(cv2.cvtColor(target_out, cv2.COLOR_BGR2RGB))
+cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target_out)
+cv2.waitKey(100)
+```
+#### 分析訓練模組 
+```py
+# 5_DNN_Test
+#frac=0.2 隨機取總資料*0.2 當frac>1要設定是否要replace =>取出後不放回
+def handleData(datas, frac ):
+    od = pd.concat(datas, axis=0)
+    
+    if frac is not None:
+        #frac 如果不設定成float numpy會出錯 格式不對
+        d = od.sample(frac = float(frac))
+    else:
+        d = od
+    ds = pd.DataFrame(d, columns=d.columns[:-1])
+    tx = ds
+    ty = to_categorical(d['target'], TARGET_DIM)
+    return (tx, ty)
+def testAcc(_model, frac = None):
+    tx, ty = handleData([df_start, df_ready], frac)
+    # batch_size = 1 一張一張比對
+    score = _model.evaluate(tx, ty , batch_size=1)
+    print ('Acc:', score[1])
+    return score[1]
 ```
 ##### 參考資料
 ##### https://www.runoob.com/python/python-func-open.html
