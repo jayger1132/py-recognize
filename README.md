@@ -151,9 +151,9 @@ Score4 = math.pow(math.pow(np.linalg.norm(Ax[5] - tmp_AVGx),2)+math.pow(np.linal
 print("與等級0比較",Score0,"\n與等級1比較",Score1,"\n與等級2比較",Score2,"\n與等級3比較",Score3,"\n與等級4比較",Score4)
 ```
 #### 二頭彎舉階段示意圖
-![image] (https://github.com/jayger1132/py-recognize/blob/main/img/%E4%BA%8C%E9%A0%AD%E5%BD%8E%E8%88%89%E9%9A%8E%E6%AE%B5%E5%9C%96.jpg)
+![image](https://github.com/jayger1132/py-recognize/blob/main/img/%E4%BA%8C%E9%A0%AD%E5%BD%8E%E8%88%89%E9%9A%8E%E6%AE%B5%E5%9C%96.jpg)
 #### 運動過程解析圖
-![image] (https://github.com/jayger1132/py-recognize/blob/main/img/%E9%81%8B%E5%8B%95%E9%81%8E%E7%A8%8B%E5%88%86%E9%A1%9E%E5%9C%96.jpg)
+![image](https://github.com/jayger1132/py-recognize/blob/main/img/%E9%81%8B%E5%8B%95%E9%81%8E%E7%A8%8B%E5%88%86%E9%A1%9E%E5%9C%96.jpg)
 #### cv2作圖、編譯中文文字
 ```py
 #Cv2輸出中文
