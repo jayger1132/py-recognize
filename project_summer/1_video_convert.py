@@ -7,11 +7,11 @@ import time
 import math
 from os import walk
 # config
-path = "./data/video/Split_squatL/complete"
+path = "./data/video/Side_Lateral_RaiseL/complete"
 paths=[]
-imgpath = "./data/imgs/from_video/Split_squatL/"
-dir = "complete"
-name = "/C"
+imgpath = "./data/imgs/from_video/Side_Lateral_RaiseL/"
+dir = "complete/"
+name = "C_"
 
 
 for root, dirs ,files in walk(path):

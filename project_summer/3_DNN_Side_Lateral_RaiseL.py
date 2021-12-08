@@ -30,15 +30,15 @@ def build_model_1():
     model.add(Dense(TARGET_DIM, activation='softmax'))
     return model
 
-df_ready = pd.read_csv('./data/csv/Split_squatL/Split_squatL_Ready.csv')
+df_ready = pd.read_csv('./data/csv/Side_Lateral_RaiseL/Side_Lateral_RaiseL_Ready.csv')
 df_ready['target'] = TARGET_READY
-df_start = pd.read_csv('./data/csv/Split_squatL/Split_squatL_Start.csv')
+df_start = pd.read_csv('./data/csv/Side_Lateral_RaiseL/Side_Lateral_RaiseL_Start.csv')
 df_start['target'] = TARGET_START
 
 
-df_ready_test = pd.read_csv('./data/csv/Split_squatL/Split_squatL_Ready_Test.csv')
+df_ready_test = pd.read_csv('./data/csv/Side_Lateral_RaiseL/Side_Lateral_RaiseL_Ready_Test.csv')
 df_ready_test['target'] = TARGET_READY
-df_start_test = pd.read_csv('./data/csv/Split_squatL/Split_squatL_Start_Test.csv')
+df_start_test = pd.read_csv('./data/csv/Side_Lateral_RaiseL/Side_Lateral_RaiseL_Start_Test.csv')
 df_start_test['target'] = TARGET_START
 
 
@@ -65,7 +65,7 @@ model.compile(loss='categorical_crossentropy', optimizer="adam", metrics=['accur
 #train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=1500, verbose=0)
 #verbose=2 為每個epoch輸出一行記錄 =1顯示進度條
 print(X_train.shape[0])
-train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=1000, verbose=1)
+train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=1500, verbose=1)
 #顯示訓練結果
 score = model.evaluate(X_train, y_train)
 print ('Train Acc:', score[1] ,'Loss :' , score[0])
@@ -74,4 +74,4 @@ print ('Test Acc:', scoreT[1], 'Loss :' , scoreT[0])
 
 
 
-model.save('./data/model/model_Split_squatL')
+model.save('./data/model/model_Side_Lateral_RaiseL2')

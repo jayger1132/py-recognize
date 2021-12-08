@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from os import walk
 
-path = "./data/csv/Split_squatL/AVG/177"
+path = "./data/csv/Side_Lateral_RaiseL/AVG/173"
 def writecsv():
     with open(path+'./AVG.csv','w',newline='') as csvf:
         writer = csv.writer(csvf)

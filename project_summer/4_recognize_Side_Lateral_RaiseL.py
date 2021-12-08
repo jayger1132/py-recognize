@@ -22,10 +22,10 @@ from tensorflow import keras
 from PIL import Image, ImageDraw, ImageFont
 class MyArgs():
     def __init__(self):
-        self.video_path = './data/video/Biceps_curl/complete/VID_20211207_174829.mp4'
-        self.model = './data/model/model_Biceps_curl'
-        self.path = "./data/csv/Biceps_curl/AVG/173"
-        self.A = [0,1,2,3,4,5,6,7]
+        self.video_path = './data/video/Side_Lateral_RaiseL/complete/VID_20211206_131750.mp4'
+        self.model = './data/model/model_Side_Lateral_RaiseL'
+        self.path = "./data/csv/Side_Lateral_RaiseL/AVG/173"
+        self.A = [0,1,5,6,7,8]
 args = MyArgs()
 dim = (480, 720)
 
@@ -476,7 +476,7 @@ while ret :
             target_out=cv2ImgAddText(target_out, "分數 "+str(Text1), 360, 50, (255, 0, 0), 35)
         #target_out=(cv2.cvtColor(target_out, cv2.COLOR_BGR2RGB))
         cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target_out)
-        cv2.waitKey(0)
+        cv2.waitKey(100)
     else :
         break
 
@@ -518,3 +518,5 @@ while ret :
 
 #處理 Calling Model.predict in graph mode is not supported when the Model instance was constructed with eager mode enabled
 #https://www.codeleading.com/article/42675321680/ 
+
+

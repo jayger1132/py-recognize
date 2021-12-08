@@ -6,8 +6,8 @@ from keras.layers.core import Dense, Activation, Dropout
 from keras.optimizers import Adam
 from keras.layers.recurrent import LSTM
 from sklearn.model_selection import train_test_split
-TARGET_STRAIGHT = 1
-TARGET_BENDING = 0
+TARGET_READY = 0
+TARGET_START = 1
 TARGET_DIM = 2
 def handleData(datas):
     #將資料都合併在一起 axis=0通常是直的合併 1為橫的
@@ -19,26 +19,31 @@ def handleData(datas):
     return (tx,ty)
 def build_model_1():
     model = Sequential()
-    model.add(Dense(64, input_shape=(75, ), activation='tanh'))
-    model.add(Dense(32, activation='tanh'))
-    model.add(Dense(16, activation='tanh'))
-    model.add(Dense(8, activation='tanh'))
-    model.add(Dense(4, activation='tanh'))
+    # 全連階層(Dense)
+    model.add(Dense(128, input_shape=(75, ), activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(32, activation='relu'))
+    model.add(Dense(16, activation='relu'))
+    model.add(Dense(8, activation='relu'))
+    model.add(Dense(4, activation='relu'))
     #Softmax 運算使得最後一層輸出的機率分佈總和為
     model.add(Dense(TARGET_DIM, activation='softmax'))
     return model
 
-df_straight = pd.read_csv('./data/csv/Biceps_curl/Biceps_curl_Straight.csv')
-df_straight['target'] = TARGET_STRAIGHT
-df_bending = pd.read_csv('./data/csv/Biceps_curl/Biceps_curl_Bending.csv')
-df_bending['target'] = TARGET_BENDING
+df_ready = pd.read_csv('./data/csv/Biceps_curl/Biceps_curl_Ready.csv')
+df_ready['target'] = TARGET_READY
+df_start = pd.read_csv('./data/csv/Biceps_curl/Biceps_curl_Start.csv')
+df_start['target'] = TARGET_START
 
-df_straight_test = pd.read_csv('./data/csv/Biceps_curl/Biceps_curl_Straight_Test.csv')
-df_straight_test['target'] = TARGET_STRAIGHT
-df_bending_test = pd.read_csv('./data/csv/Biceps_curl/Biceps_curl_Bending_Test.csv')
-df_bending_test['target'] = TARGET_BENDING
+
+df_ready_test = pd.read_csv('./data/csv/Biceps_curl/Biceps_curl_Ready_Test.csv')
+df_ready_test['target'] = TARGET_READY
+df_start_test = pd.read_csv('./data/csv/Biceps_curl/Biceps_curl_Start_Test.csv')
+df_start_test['target'] = TARGET_START
+
+
 #有時候格式跑掉可以先去第一排+個字在重新run 我是在Score旁+一行
-X ,y = handleData([df_straight,df_bending,df_straight_test,df_bending_test])
+X ,y = handleData([df_ready,df_start,df_ready_test,df_start_test])
 #test_size=0.2 -> training : test = 8 : 2
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=39)
 #DF用法 , loc/iloc 差在iloc通常都是用數字(index去取資料) loc是用"name"
@@ -52,16 +57,18 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 model = build_model_1()
 model.summary()
+# 使用categorical_crossentropy損失時，目標值應該是分類格式假設分為3，那就是3維的向量，除了表示類別index為1其他都為0
 model.compile(loss='categorical_crossentropy', optimizer="adam", metrics=['accuracy'])
 
 #開始訓練模型
 #X_train.shape (列,行)
 #train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=1500, verbose=0)
-train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=100, verbose=0)
+#verbose=2 為每個epoch輸出一行記錄 =1顯示進度條
+train_history = model.fit(X_train, y_train, batch_size=X_train.shape[0], validation_data=(X_test, y_test), epochs=1500, verbose=1)
 #顯示訓練結果
 score = model.evaluate(X_train, y_train)
-print ('Train Acc:', score[1])
+print ('Train Acc:', score[1] ,'Loss :' , score[0])
 score = model.evaluate(X_test, y_test)
-print ('Test Acc:', score[1])
+print ('Test Acc:', score[1], 'Loss :' , score[0])
 
-model.save('./data/model/model_Biceps_curl')
+model.save('./data/model/model_Biceps_curl2')

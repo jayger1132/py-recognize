@@ -20,11 +20,11 @@ import tensorflow as tf
 from tensorflow import keras
 class MyArgs():
     def __init__(self):
-        self.video_path = './data/video/Split_squatL/Split_squatL173/3/VID_20211130_145632.mp4'
+        self.video_path = './data/video/Split_squatL/complete/VID_20211130_150920.mp4'
         self.model = './data/model/model_Split_squatL'
         self.path = "./data/csv/Split_squatL/AVG/173"
         self.A = [0,1,2,5,8,9,10,11,12,13]
-        self.AD = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18,22,23,24]
+        #self.AD = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18]
 args = MyArgs()
 dim = (480, 720)
 
@@ -77,7 +77,7 @@ def detection(img ):
     offsetneck = float(datum.poseKeypoints[0][1][0] - (img.shape[1] / 2))
     #print (offsetneck,img.shape)
     #Model
-    for i in range(0,len(args.AD)):
+    for i in range(0,25):
         if i != 1:
             if float(datum.poseKeypoints[0][i][0]) != 0.0:
                 #print(datum.poseKeypoints[0][i][0])
@@ -114,7 +114,7 @@ def detection(img ):
     df = pd.DataFrame(tmp_data)
     #print(df.values)
     data = np.array(df.values)
-    data = data.reshape((1, 3*len(args.AD)))
+    data = data.reshape((1, 75))
     #print(data)
     #cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", datum.cvOutputData)
     img2 = datum.cvOutputData
@@ -322,7 +322,7 @@ def detection(img ):
         #args = MyArgs()
         model = keras.models.load_model(args.model)
         #reshap[1,1,1,...~75個]
-        model.predict(np.ones((1, 3*len(args.AD))))
+        model.predict(np.ones((1, 75)))
         #model.predict_classes(test)預測的是類別 ，model.predict(test) 預測的是數值
         rest = model.predict_classes(data,verbose=0)
         #print("=================",rest[0])
