@@ -7,11 +7,11 @@ import time
 import math
 from os import walk
 # config
-path = "./unrecognize/"
+path = "./data/video/Side_Lateral_RaiseR/complete"
 paths=[]
-imgpath = "./data/imgs/"
-dir = "test/"
-name = "D"
+imgpath = "./data/imgs/Side_Lateral_RaiseR/"
+dir = "complete/"
+name = "C"
 
 
 for root, dirs ,files in walk(path):
@@ -28,7 +28,6 @@ for root, dirs ,files in walk(path):
 def toDHash(img):
     img = cv2.resize(img, (9, 8), interpolation=cv2.INTER_CUBIC)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    
     h = []
     for i in range(8):
         for j in range(8):

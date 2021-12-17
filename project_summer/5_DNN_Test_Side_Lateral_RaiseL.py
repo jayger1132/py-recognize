@@ -25,28 +25,31 @@ def testAcc(_model, frac = None):
     
     score = _model.evaluate(tx, ty , batch_size=1)
     print ('Acc:', score[1])
-    return score[1]
+    return (score[1]*100)
 
-df_start = pd.read_csv('./data/csv/Biceps_curl/AVG/173/Biceps_curl4.csv')
+df_start = pd.read_csv('./data/csv/Side_Lateral_RaiseL/Analys_Start.csv')
 df_start['target'] = TARGET_START
-df_ready = pd.read_csv('./data/csv/Biceps_curl/AVG/173/Biceps_curl0.csv')
+df_ready = pd.read_csv('./data/csv/Side_Lateral_RaiseL/Analys_Ready.csv')
 df_ready['target'] = TARGET_READY
 
-tmodel = keras.models.load_model('./data/model/model_Biceps_curl')
+tmodel = keras.models.load_model('./data/model/model_Side_Lateral_RaiseL')
 scores = []
-rgs = np.arange(1, 0, -0.2)
+rgs = np.arange(1, 0, -0.1)
 
 for i in rgs:
     acc = testAcc(tmodel, i)
     scores.append(acc)
 #(x,y,color)
-plt.plot(rgs, scores,color=(255/255,100/255,100/255))
+plt.plot(rgs, scores,color=(0/255,0/255,0/255),linewidth=3.0)
 #調整Y軸顯示範圍
-plt.ylim(0, 1)
+plt.ylim(90, 100)
+# 設定刻度字型大小
+plt.xticks(fontsize=20,family = "Times New Roman")
+plt.yticks(fontsize=20,family = "Times New Roman")
 #顯示網格
 plt.grid(True)
-plt.xlabel("Sampling rate")
-plt.ylabel("Accuracy (%)")
+plt.xlabel("Sampling rate" ,family = "Times New Roman", size = 25)
+plt.ylabel("Accuracy (%)" ,family = "Times New Roman", size = 25)
 plt.show()
 
 print(scores)

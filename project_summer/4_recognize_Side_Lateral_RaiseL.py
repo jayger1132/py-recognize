@@ -20,12 +20,15 @@ import pandas
 import tensorflow as tf
 from tensorflow import keras
 from PIL import Image, ImageDraw, ImageFont
+from os import walk
+
+
 class MyArgs():
     def __init__(self):
-        self.video_path = './data/video/Side_Lateral_RaiseL/complete/VID_20211206_131750.mp4'
+        self.video_path = "./temp/VID_20211216_203838.mp4"
         self.model = './data/model/model_Side_Lateral_RaiseL'
         self.path = "./data/csv/Side_Lateral_RaiseL/AVG/173"
-        self.A = [0,1,5,6,7,8]
+        self.A = [0,1,2,3,4,5,6,7,8,]
 args = MyArgs()
 dim = (480, 720)
 
@@ -162,8 +165,8 @@ def detection(img ):
                 Score2 = math.pow(math.pow(np.linalg.norm(Ax[3] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[3] - tmp_AVGy),2),0.5)
                 Score3 = math.pow(math.pow(np.linalg.norm(Ax[4] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[4] - tmp_AVGy),2),0.5)
                 Score4 = math.pow(math.pow(np.linalg.norm(Ax[5] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[5] - tmp_AVGy),2),0.5)
-                print("與等級0比較",Score0,"\n與等級1比較",Score1,"\n與等級2比較",Score2,"\n與等級3比較",Score3,"\n與等級4比較",Score4)
-                #print(score01,score12,score23,score34)
+                # print("與等級0比較",Score0,"\n與等級1比較",Score1,"\n與等級2比較",Score2,"\n與等級3比較",Score3,"\n與等級4比較",Score4)
+                # print(score01,score12,score23,score34)
                 #flag紀錄等級
                 LV = 0
                 ScoreU = 0
@@ -314,8 +317,8 @@ def detection(img ):
                     else:
                         print("在LV" , LV ,"上面")
                         ScoreU =  ScoreD = Score4
-                        if(ScoreU <= 4*Score34 or ScoreD <=4*Score34):
-                            ScoreDU = 3
+                        if(ScoreU <= 2*Score34 or ScoreD <=2*Score34):
+                            ScoreDU = 2
                             ScoreDD = 3
                     
         #預測
@@ -383,10 +386,10 @@ with open(args.path + "/AVG.csv", newline='') as csvfile:
         Score0_3 = math.pow(math.pow(np.linalg.norm(Ax[1] - Ax[4]),2)+math.pow(np.linalg.norm(Ay[1] - Ay[4]),2),0.5)
         Score0_4 = math.pow(math.pow(np.linalg.norm(Ax[1] - Ax[5]),2)+math.pow(np.linalg.norm(Ay[1] - Ay[5]),2),0.5)
         
-        print("等級0~1距離 :" , Score01)
-        print("等級1~2距離 :" , Score12 , "等級0~2距離 : ",Score0_2)
-        print("等級2~3距離 :" , Score23 , "等級0~3距離 : ",Score0_3)
-        print("等級3~4距離 :" , Score34 , "等級0~4距離 : ",Score0_4)
+        #print("等級0~1距離 :" , Score01)
+        #print("等級1~2距離 :" , Score12 , "等級0~2距離 : ",Score0_2)
+        #print("等級2~3距離 :" , Score23 , "等級0~3距離 : ",Score0_3)
+        #print("等級3~4距離 :" , Score34 , "等級0~4距離 : ",Score0_4)
 cap = cv2.VideoCapture(args.video_path)
 # ret為T/F 代表有沒有讀到圖片 frame 是一偵
 #ret, frame = cap.read()
@@ -405,6 +408,8 @@ Time = 0
 #計算動作次數
 Action_flag = 0
 Action_time = 0
+#作影片用
+EndTime = 1 
 tempA = []
 tempSCDU = []
 tempSCDD = []
@@ -429,32 +434,44 @@ while ret :
         if (Flag_action == 'None'):
             continue
         elif(Flag_action == 'Ready'):
-            
+            cv2.rectangle(target_out, (280, 10), (470, 60), (255, 255, 255), -1)
+            cv2.putText(target_out, 'Stationary', (285, 45), 4, 1, (255, 0, 0), 1, 35)
+            #cv2.imwrite('./img/Side_Lateral_RaiseL/'+str(Action_time)+"-"+str(Time)+"-"+str(LV_out)+'.jpg', target_out)
             if(Action_flag == 1):
-                Action_time += 1
                 Action_flag = 0
+                Time += 1
                 #分數
                 Grade = 0
                 for i in range(0,len(tempA)) :
-                    if i<len(tempA)/2:
-
+                    if tempSCDU[i]>tempSCDD[i]:
                         Grade += tempSCDU[i]
                     else :
                         Grade += tempSCDD[i]
-                    
+                cv2.rectangle(target_out, (280, 10), (470, 90), (255, 255, 255), -1)
+                cv2.putText(target_out, 'Stationary', (285, 45), 4, 1, (255, 0, 0), 1, 35)
+                target_out=cv2ImgAddText(target_out, "本次動作評分為 "+str(round(Grade/len(tempA), 2)), 290, 50, (255, 0, 0), 20)
                 print("評分為",Grade/len(tempA))
-                #計算時間點
+                #儲存圖片
+                #cv2.imwrite('./img/Side_Lateral_RaiseL/'+str(Action_time)+"-"+str(Time)+"-"+str(LV_out)+'.jpg', target_out)
+                #計算時間點,emdtime
+                Endtime =0
                 Time = 0
                 tempA = []
                 tempSCDU = []
                 tempSCDD = []
+                Action_time += 1
         else:
+            cv2.rectangle(target_out, (350, 10), (470, 90), (255, 255, 255), -1)
+            target_out=cv2ImgAddText(target_out, "階段 "+str(LV_out), 360, 15, (255, 0, 0), 35)
+            target_out=cv2ImgAddText(target_out, "分數 "+str(max(SCDUout,SCDDout)), 360, 50, (255, 0, 0), 35)
             Time += 1
             print ("SCDU : ",SCDUout )
             print ("SCDD : ",SCDDout )
             tempA.extend([LV_out])
             tempSCDU.extend([SCDUout])
             tempSCDD.extend([SCDDout])
+            #儲存圖片   
+            #cv2.imwrite('./img/Side_Lateral_RaiseL/'+str(Action_time)+"-"+str(Time)+"-"+str(LV_out)+'.jpg', target_out)
             if(Time>=7):
                 Action_flag = 1
         
@@ -464,21 +481,14 @@ while ret :
         print("Time : " , Time , "Action_time : " ,Action_time)
         print("TempA : ",tempA ,"\nTempSCDU : " ,tempSCDU , "\nTempSCDD : " ,tempSCDD)
         #print(is_okay,"===============================================")
-        Text1 = max(SCDUout,SCDDout)
-        if(Flag_action == "Ready" ):
-            cv2.rectangle(target_out, (350, 10), (470, 60), (255, 255, 255), -1)
-            cv2.putText(target_out, 'Pause', (360, 45), 4, 1, (255, 0, 0), 1, cv2.LINE_AA)
-            
-        else :
-            
-            cv2.rectangle(target_out, (350, 10), (470, 90), (255, 255, 255), -1)
-            target_out=cv2ImgAddText(target_out, "階段 "+str(LV_out), 360, 15, (255, 0, 0), 35)
-            target_out=cv2ImgAddText(target_out, "分數 "+str(Text1), 360, 50, (255, 0, 0), 35)
+        cv2.imwrite('./temp/normal/V2'+str(int(count/6))+'.jpg', target_out)    
         #target_out=(cv2.cvtColor(target_out, cv2.COLOR_BGR2RGB))
-        cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target_out)
-        cv2.waitKey(100)
+        #cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target_out)
+        cv2.waitKey(110)
     else :
         break
+
+
 
 #print(Out_put.items())
 #if(max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級一'] ) :

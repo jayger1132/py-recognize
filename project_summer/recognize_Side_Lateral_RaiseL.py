@@ -21,22 +21,43 @@ import tensorflow as tf
 from tensorflow import keras
 from PIL import Image, ImageDraw, ImageFont
 from os import walk
+
 unrecognize_path = './unrecognize'
+
 for root, dirs ,files in walk(unrecognize_path):
     print("路徑：", root)
     print("  目錄：", dirs)
     print("  檔案：", files)
     for file in files:  
         print(root + '/' + str(file))
-        
+
 class MyArgs():
     def __init__(self):
         self.video_path = (root + '/' + str(file))
-        self.model = './data/model/model_Biceps_curl'
-        self.path = "./data/csv/Biceps_curl/AVG/173"
-        self.A = [0,1,2,3,4,5,6,7]
+        self.model = './data/model/model_Side_Lateral_RaiseL'
+        self.path = "./data/csv/Side_Lateral_RaiseL/AVG/173"
+        self.A = [0,1,5,6,7,8,15,16,17,18]
 args = MyArgs()
 dim = (480, 720)
+
+action = "Side_Lateral_RaiseL"
+recognize_path = "./img/"+action+"/"
+# 使用 try 建立目錄 
+try:
+  os.makedirs(recognize_path+"error/")
+# 檔案已存在的例外處理
+except FileExistsError:
+  print("檔案已存在。")
+try:
+  os.makedirs("./img"+action)
+# 檔案已存在的例外處理
+except FileExistsError:
+  print("檔案已存在。")
+
+#回饋建議
+with open(recognize_path+"suggest.csv", 'w', newline='') as csvfile:
+    # 建立 CSV 檔寫入器
+    writer = csv.writer(csvfile)
 
 # Import Openpose (Windows/Ubuntu/OSX)
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -85,7 +106,7 @@ def detection(img ):
     tmp_AVGy = []
     target = []
     if(str(datum.poseKeypoints)=='None'):
-        return ("None" , img , 0 , 0 ,0)
+        return ("None" , img , 0 , 0 , 0 , None)
     else:
         offsetneck = float(datum.poseKeypoints[0][1][0] - (img.shape[1] / 2))
         #print (offsetneck,img.shape)
@@ -171,7 +192,7 @@ def detection(img ):
                 Score2 = math.pow(math.pow(np.linalg.norm(Ax[3] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[3] - tmp_AVGy),2),0.5)
                 Score3 = math.pow(math.pow(np.linalg.norm(Ax[4] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[4] - tmp_AVGy),2),0.5)
                 Score4 = math.pow(math.pow(np.linalg.norm(Ax[5] - tmp_AVGx),2)+math.pow(np.linalg.norm(Ay[5] - tmp_AVGy),2),0.5)
-                print("與等級0比較",Score0,"\n與等級1比較",Score1,"\n與等級2比較",Score2,"\n與等級3比較",Score3,"\n與等級4比較",Score4)
+                #print("與等級0比較",Score0,"\n與等級1比較",Score1,"\n與等級2比較",Score2,"\n與等級3比較",Score3,"\n與等級4比較",Score4)
                 #print(score01,score12,score23,score34)
                 #flag紀錄等級
                 LV = 0
@@ -179,6 +200,8 @@ def detection(img ):
                 ScoreD = 0
                 ScoreDU = 0 
                 ScoreDD = 0
+                #儲存 錯誤動作資訊
+                Suggest = []
                 if(min(Score0,Score1,Score2,Score3,Score4)) == Score0:
                     LV = 0
                 elif(min(Score0,Score1,Score2,Score3,Score4)) == Score1:
@@ -190,8 +213,8 @@ def detection(img ):
                         #在 等級1下面 => 與起始點0比較距離 往上時ScoreU = 0 ; ScoreD = 1
                         ScoreU = Score0
                         ScoreD = Score1
-                        print("在LV" , LV ,"下面")
-                        print("SCU , SCD : ",ScoreU ,ScoreD )
+                        #print("在LV" , LV ,"下面")
+                        #print("SCU , SCD : ",ScoreU ,ScoreD )
                         if (ScoreU<=Score01):
                             ScoreDU = 1
                         elif (ScoreU>Score01 and ScoreU <= 2*Score01):
@@ -208,8 +231,8 @@ def detection(img ):
                         #在 等級1上面 => 與起始點1比較距離 往上時ScoreU = 1 ; ScoreD = 2
                         ScoreU = Score1
                         ScoreD = Score2
-                        print("在LV" , LV ,"上面")
-                        print("SCU , SCD : ",ScoreU ,ScoreD )
+                        #print("在LV" , LV ,"上面")
+                        #print("SCU , SCD : ",ScoreU ,ScoreD )
                         if(ScoreU <= Score12):
                             ScoreDU = 3
                         elif (ScoreU>Score12 and ScoreU <= 2*Score12):
@@ -230,8 +253,8 @@ def detection(img ):
                         #在 等級2下面 => 與起始點1比較距離 往上時ScoreU = 1 ; ScoreD = 2
                         ScoreU = Score1
                         ScoreD = Score2
-                        print("在LV" , LV ,"下面")
-                        print("SCU , SCD : ",ScoreU ,ScoreD )
+                        #print("在LV" , LV ,"下面")
+                        #print("SCU , SCD : ",ScoreU ,ScoreD )
                         if (ScoreU<=Score12):
                             ScoreDU = 1
                         elif (ScoreU>Score12 and ScoreU <= 2*Score12):
@@ -248,8 +271,8 @@ def detection(img ):
                         #在 等級2上面 => 與起始點3比較距離 往上時ScoreU = 2 ; ScoreD = 3
                         ScoreU = Score2
                         ScoreD = Score3
-                        print("在LV" , LV ,"上面")
-                        print("SCU , SCD : ",ScoreU ,ScoreD )
+                        #print("在LV" , LV ,"上面")
+                        #print("SCU , SCD : ",ScoreU ,ScoreD )
                         if(ScoreU <= Score23):
                             ScoreDU = 3
                         elif (ScoreU>Score23 and ScoreU <= 2*Score23):
@@ -269,8 +292,8 @@ def detection(img ):
                     if(Score0 <= Score0_3):
                         ScoreU = Score2
                         ScoreD = Score3
-                        print("在LV" , LV ,"下面")
-                        print("SCU , SCD : ",ScoreU ,ScoreD )
+                        #print("在LV" , LV ,"下面")
+                        #print("SCU , SCD : ",ScoreU ,ScoreD )
                         if (ScoreU<=Score23):
                             ScoreDU = 1
                         elif (ScoreU>Score23 and ScoreU <= 2*Score23):
@@ -286,8 +309,8 @@ def detection(img ):
                     else:
                         ScoreU = Score3
                         ScoreD = Score4
-                        print("在LV" , LV ,"上面")
-                        print("SCU , SCD : ",ScoreU ,ScoreD )
+                        #print("在LV" , LV ,"上面")
+                        #print("SCU , SCD : ",ScoreU ,ScoreD )
                         if(ScoreU <= Score34):
                             ScoreDU = 3
                         elif (ScoreU>Score34 and ScoreU <= 2*Score34):
@@ -306,8 +329,8 @@ def detection(img ):
                     if(Score0 <= Score0_4):
                         ScoreU = Score3
                         ScoreD = Score4
-                        print("在LV" , LV ,"下面")
-                        print("SCU , SCD : ",ScoreU ,ScoreD )
+                        #print("在LV" , LV ,"下面")
+                        #print("SCU , SCD : ",ScoreU ,ScoreD )
                         if (ScoreU<=Score34):
                             ScoreDU = 1
                         elif (ScoreU>Score34 and ScoreU <= 2*Score34):
@@ -321,11 +344,13 @@ def detection(img ):
                         elif (ScoreD>2*Score34 and ScoreD<= 3*Score34):
                             ScoreDD = 1
                     else:
-                        print("在LV" , LV ,"上面")
+                        #print("在LV" , LV ,"上面")
                         ScoreU =  ScoreD = Score4
-                        if(ScoreU <= 4*Score34 or ScoreD <=4*Score34):
+                        if(ScoreU <= 3.5*Score34 or ScoreD <=3.5*Score34):
                             ScoreDU = 3
                             ScoreDD = 3
+                        else :
+                            Suggest.extend(['手臂舉過高'])
                     
         #預測
         with tf.Graph().as_default():
@@ -339,9 +364,9 @@ def detection(img ):
             rest = model.predict_classes(data,verbose=0)
             #print("=================",rest[0])
             if rest[0] == 0:
-                return ('Ready', img2 , LV , ScoreDU , ScoreDD)
+                return ('Ready', img2 , LV , ScoreDU , ScoreDD , None)
             elif rest[0] == 1:
-                return ('Start', img2 , LV , ScoreDU , ScoreDD)
+                return ('Start', img2 , LV , ScoreDU , ScoreDD , Suggest)
 
 #Cv2輸出中文
 def cv2ImgAddText(img, text, left, top, textColor=(0, 255, 0), textSize=20):
@@ -392,10 +417,10 @@ with open(args.path + "/AVG.csv", newline='') as csvfile:
         Score0_3 = math.pow(math.pow(np.linalg.norm(Ax[1] - Ax[4]),2)+math.pow(np.linalg.norm(Ay[1] - Ay[4]),2),0.5)
         Score0_4 = math.pow(math.pow(np.linalg.norm(Ax[1] - Ax[5]),2)+math.pow(np.linalg.norm(Ay[1] - Ay[5]),2),0.5)
         
-        print("等級0~1距離 :" , Score01)
-        print("等級1~2距離 :" , Score12 , "等級0~2距離 : ",Score0_2)
-        print("等級2~3距離 :" , Score23 , "等級0~3距離 : ",Score0_3)
-        print("等級3~4距離 :" , Score34 , "等級0~4距離 : ",Score0_4)
+        #print("等級0~1距離 :" , Score01)
+        #print("等級1~2距離 :" , Score12 , "等級0~2距離 : ",Score0_2)
+        #print("等級2~3距離 :" , Score23 , "等級0~3距離 : ",Score0_3)
+        #print("等級3~4距離 :" , Score34 , "等級0~4距離 : ",Score0_4)
 cap = cv2.VideoCapture(args.video_path)
 # ret為T/F 代表有沒有讀到圖片 frame 是一偵
 #ret, frame = cap.read()
@@ -420,7 +445,11 @@ tempA = []
 tempSCDU = []
 tempSCDD = []
 #Out_put = { '等級一': 0 , '等級二': 0 , '等級三': 0 ,'等級四': 0 }
-
+#製作 csv用
+csv_Time = 0
+csv_Data = [] #儲存成一列(橫排)
+#總和
+Grade_temp = 0
 while ret :
     ret, img = cap.read()
     #計算幀數
@@ -434,7 +463,7 @@ while ret :
         # 模糊可能還要測試 越高辨識率會變差，越低誤判率會變高 要找合適的中間值
         img = cv2.GaussianBlur(img, (7,7), 0)
         # 檢測
-        (Flag_action,target_out ,LV_out , SCDUout ,SCDDout ) = detection(img )
+        (Flag_action,target_out ,LV_out , SCDUout ,SCDDout , Suggest) = detection(img)
 
         #==============偵測是否開始運動================未完成===========
         if (Flag_action == 'None'):
@@ -449,15 +478,15 @@ while ret :
                 #分數
                 Grade = 0
                 for i in range(0,len(tempA)) :
-                    if i<len(tempA)/2:
-
+                    if tempSCDU[i]>tempSCDD[i]:
                         Grade += tempSCDU[i]
                     else :
                         Grade += tempSCDD[i]
                 cv2.rectangle(target_out, (280, 10), (470, 90), (255, 255, 255), -1)
                 cv2.putText(target_out, 'Stationary', (285, 45), 4, 1, (255, 0, 0), 1, 35)
-                target_out=cv2ImgAddText(target_out, "本次動作評分為 "+str(Grade/len(tempA)), 290, 50, (255, 0, 0), 20)
-                print("評分為",Grade/len(tempA))
+                target_out=cv2ImgAddText(target_out, "本次動作評分為 "+str(round(Grade/len(tempA), 2)), 290, 50, (255, 0, 0), 20)
+                Grade_temp += Grade/len(tempA) 
+                #print("評分為",Grade/len(tempA))
                 #儲存圖片
                 #cv2.imwrite('./img/Side_Lateral_RaiseL/'+str(Action_time)+"-"+str(Time)+"-"+str(LV_out)+'.jpg', target_out)
                 #計算時間點,emdtime
@@ -472,13 +501,24 @@ while ret :
             target_out=cv2ImgAddText(target_out, "階段 "+str(LV_out), 360, 15, (255, 0, 0), 35)
             target_out=cv2ImgAddText(target_out, "分數 "+str(max(SCDUout,SCDDout)), 360, 50, (255, 0, 0), 35)
             Time += 1
-            print ("SCDU : ",SCDUout )
-            print ("SCDD : ",SCDDout )
+            #print ("SCDU : ",SCDUout )
+            #print ("SCDD : ",SCDDout )
+
+            if(max(SCDUout,SCDDout)==0 or max(SCDUout,SCDDout)==0):
+                csv_Time+=1
+                #儲存圖片
+                
+                cv2.imwrite(recognize_path+'error/'+action+str(int(count/6))+'.jpg', target_out)
+                csv_Data.extend([Suggest])
+                if ((csv_Time)%4 ==0):
+                    with open(recognize_path+'suggest.csv', 'a+', newline='') as csvfile:
+                        # 建立 CSV 檔寫入器
+                        writer = csv.writer(csvfile)
+                        writer.writerow(csv_Data)
+
             tempA.extend([LV_out])
             tempSCDU.extend([SCDUout])
             tempSCDD.extend([SCDDout])
-            #儲存圖片   
-            #cv2.imwrite('./img/Side_Lateral_RaiseL/'+str(Action_time)+"-"+str(Time)+"-"+str(LV_out)+'.jpg', target_out)
             if(Time>=7):
                 Action_flag = 1
         
@@ -487,34 +527,24 @@ while ret :
         print("狀態 : " , Flag_action)
         print("Time : " , Time , "Action_time : " ,Action_time)
         print("TempA : ",tempA ,"\nTempSCDU : " ,tempSCDU , "\nTempSCDD : " ,tempSCDD)
-        #print(is_okay,"===============================================")
-        cv2.imwrite('./img/Side_Lateral_RaiseL/'+str(int(count/6))+'.jpg', target_out)    
+        #print(is_okay,"===============================================")    
         #target_out=(cv2.cvtColor(target_out, cv2.COLOR_BGR2RGB))
-        cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target_out)
-        cv2.waitKey(110)
+        cv2.imwrite(recognize_path+action+str(int(count/6))+'.jpg', target_out)
+        #cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target_out)
+        #cv2.waitKey(0)
     else :
         break
-import numpy as np
-import cv2
-from os import walk
-#讀取一張圖片
-dim = (480,720)
-videowrite = cv2.VideoWriter('./img/Side_Lateral_RaiseL/test.mp4',-1,2,dim)#20是幀數，size是圖片尺寸
-img_array=[]
-path = "./img/Side_Lateral_RaiseL/"
-for root, dirs ,files in walk(path):
-    len=(len(files))
-    #print("路徑：", root)
-    #print("  目錄：", dirs)
-    #print("  檔案：", files)
-        
-for filename in [(path+'{0}.jpg').format(i) for i in range(len-1)]:
-    img = cv2.imread(filename)
-    if img is None:
-        print(filename + " is error!")
-        continue
-    img_array.append(img)
-#print(img_array)
+print("~~")
+#txtpath2 最後總分
+txtpath2 = recognize_path + 'score.txt'
+if(Action_time==0):
+    Action_time = 1 
+f = open(txtpath2, 'w')
+f.write(str(Grade_temp/Action_time) )
+f.close()
+sys.exit()
+
+
 #print(Out_put.items())
 #if(max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級一'] ) :
 #    LV = 1
@@ -553,3 +583,5 @@ for filename in [(path+'{0}.jpg').format(i) for i in range(len-1)]:
 
 #處理 Calling Model.predict in graph mode is not supported when the Model instance was constructed with eager mode enabled
 #https://www.codeleading.com/article/42675321680/ 
+
+

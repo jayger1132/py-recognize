@@ -10,9 +10,11 @@ import argparse
 import pandas
 #enviroment
 parser = argparse.ArgumentParser()
-csv_path = "./data/csv/Side_Lateral_RaiseR/Side_Lateral_RaiseR0.csv"
+csv_path = "./data/csv/Side_Lateral_RaiseR/Side_Lateral_RaiseR_Start_Test.csv"
+#18
+#A = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18]
 #圖片位置
-parser.add_argument("--image_dir", default="./data/imgs/test", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_dir", default="./data/imgs/Side_Lateral_RaiseR/DNN_Start_Test", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 #def write_csv()
 try:
     # Import Openpose (Windows/Ubuntu/OSX)
@@ -142,7 +144,7 @@ try:
             
             writer.writerow(data)
             
-        #    #writer.writerow(["","",""]) #nan
+        #writer.writerow(["","",""]) #nan
 
         if not args[0].no_display:
             cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", datum.cvOutputData)
@@ -163,3 +165,6 @@ try:
 except Exception as e:
     print(e)
     sys.exit(0)
+
+
+

@@ -323,7 +323,7 @@ def detection(img ):
                     else:
                         print("在LV" , LV ,"上面")
                         ScoreU =  ScoreD = Score4
-                        if(ScoreU <= 4*Score34 or ScoreD <=4*Score34):
+                        if(ScoreU <= 3.5*Score34 or ScoreD <=3.5*Score34):
                             ScoreDU = 3
                             ScoreDD = 3
                     
@@ -409,6 +409,7 @@ video_size = (img.shape[1], img.shape[0])
 
 start_handle_time = time.time()
 count = -1
+
 #計算張數
 Time = 0
 #計算動作次數
@@ -420,7 +421,8 @@ tempA = []
 tempSCDU = []
 tempSCDD = []
 #Out_put = { '等級一': 0 , '等級二': 0 , '等級三': 0 ,'等級四': 0 }
-
+#總和
+Grade_temp = 0
 while ret :
     ret, img = cap.read()
     #計算幀數
@@ -449,8 +451,7 @@ while ret :
                 #分數
                 Grade = 0
                 for i in range(0,len(tempA)) :
-                    if i<len(tempA)/2:
-
+                    if tempSCDU[i]>tempSCDD[i]:
                         Grade += tempSCDU[i]
                     else :
                         Grade += tempSCDD[i]
@@ -458,6 +459,7 @@ while ret :
                 cv2.putText(target_out, 'Stationary', (285, 45), 4, 1, (255, 0, 0), 1, 35)
                 target_out=cv2ImgAddText(target_out, "本次動作評分為 "+str(Grade/len(tempA)), 290, 50, (255, 0, 0), 20)
                 print("評分為",Grade/len(tempA))
+                Grade_temp += Grade/len(tempA) 
                 #儲存圖片
                 #cv2.imwrite('./img/Side_Lateral_RaiseL/'+str(Action_time)+"-"+str(Time)+"-"+str(LV_out)+'.jpg', target_out)
                 #計算時間點,emdtime
@@ -488,33 +490,21 @@ while ret :
         print("Time : " , Time , "Action_time : " ,Action_time)
         print("TempA : ",tempA ,"\nTempSCDU : " ,tempSCDU , "\nTempSCDD : " ,tempSCDD)
         #print(is_okay,"===============================================")
-        cv2.imwrite('./img/Side_Lateral_RaiseL/'+str(int(count/6))+'.jpg', target_out)    
+        cv2.imwrite('./img/Side_Lateral_RaiseL/Side_Lateral_RaiseL'+str(int(count/6))+'.jpg', target_out)    
         #target_out=(cv2.cvtColor(target_out, cv2.COLOR_BGR2RGB))
-        cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target_out)
-        cv2.waitKey(110)
+        #cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target_out)
+        #cv2.waitKey(110)
     else :
+        #txtpath2 最後總分
+        txtpath2 = recognize_path + 'score.txt'
+        f = open(txtpath2, 'w')
+        f.write(Grade_temp/Action_time )
+        f.close()
+        sys.exit()
         break
-import numpy as np
-import cv2
-from os import walk
-#讀取一張圖片
-dim = (480,720)
-videowrite = cv2.VideoWriter('./img/Side_Lateral_RaiseL/test.mp4',-1,2,dim)#20是幀數，size是圖片尺寸
-img_array=[]
-path = "./img/Side_Lateral_RaiseL/"
-for root, dirs ,files in walk(path):
-    len=(len(files))
-    #print("路徑：", root)
-    #print("  目錄：", dirs)
-    #print("  檔案：", files)
-        
-for filename in [(path+'{0}.jpg').format(i) for i in range(len-1)]:
-    img = cv2.imread(filename)
-    if img is None:
-        print(filename + " is error!")
-        continue
-    img_array.append(img)
-#print(img_array)
+
+
+
 #print(Out_put.items())
 #if(max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級一'] ) :
 #    LV = 1
@@ -553,3 +543,5 @@ for filename in [(path+'{0}.jpg').format(i) for i in range(len-1)]:
 
 #處理 Calling Model.predict in graph mode is not supported when the Model instance was constructed with eager mode enabled
 #https://www.codeleading.com/article/42675321680/ 
+
+

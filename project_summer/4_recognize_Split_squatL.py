@@ -3,6 +3,7 @@ import argparse
 import time
 import os
 import math
+from os import walk
 import numpy as np
 import pandas as pd
 import functools
@@ -18,9 +19,10 @@ import argparse
 import pandas
 import tensorflow as tf
 from tensorflow import keras
+
 class MyArgs():
     def __init__(self):
-        self.video_path = './data/video/Split_squatL/complete/VID_20211130_150920.mp4'
+        self.video_path = "./temp/Side_Lateral_RaiseL1"
         self.model = './data/model/model_Split_squatL'
         self.path = "./data/csv/Split_squatL/AVG/173"
         self.A = [0,1,2,5,8,9,10,11,12,13]
