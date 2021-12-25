@@ -7,10 +7,10 @@ import time
 import math
 from os import walk
 # config
-path = "./unrecognize/"
+path = "./data/csv/Side_Lateral_RaiseL/endvideo/Biceps_curl"
 paths=[]
-imgpath = "./data/imgs/"
-dir = "test/"
+imgpath = "./data/csv/Side_Lateral_RaiseL/"
+dir = "endimg/"
 name = "D"
 
 

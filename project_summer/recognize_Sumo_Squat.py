@@ -27,7 +27,7 @@ import pymysql
 unrecognize_path = './unrecognize'
 
 for root, dirs ,files in walk(unrecognize_path):
-    print("路徑：", root)
+    print("  路徑：", root)
     print("  目錄：", dirs)
     print("  檔案：", files)
     for file in files:  
@@ -35,19 +35,18 @@ for root, dirs ,files in walk(unrecognize_path):
 
 class MyArgs():
     def __init__(self):
-        #self.video_path = "./data/csv/Side_Lateral_RaiseL/endvideo/Side_Lateral_RaiseL.mp4"
+        #self.video_path = "./data/csv/Side_Lateral_RaiseL/endvideo/Sumo_Squat/VID_20211220_175847.mp4"
         self.video_path = (root + '/' + str(file))
-        self.model = './data/model/model_Side_Lateral_RaiseL'
-        self.path = "./data/csv/Side_Lateral_RaiseL/AVG/173"
-        self.A = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,18,19,20,21,22,23,24]
-        self.actionCH  = "平舉(左)"
+        self.model = './data/model/model_Sumo_Squat'
+        self.path = "./data/csv/Sumo_Squat/AVG/173"
+        self.A = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
+        self.actionCH  = "相撲式硬舉"
         self.flagHand = 0
         self.flagBody = 0
-
 args = MyArgs()
 dim = (480, 720)
 
-action = "Side_Lateral_RaiseL"
+action = "Sumo_Squat"
 recognize_path = "./img/"+action+"/"
 print(recognize_path)
 # 使用 try 建立目錄 
@@ -61,6 +60,7 @@ try:
 # 檔案已存在的例外處理
 except FileExistsError:
     print("檔案已存在。")
+
 
 ###########################################################################
 # Import Openpose (Windows/Ubuntu/OSX)
@@ -121,7 +121,7 @@ def detection(img ):
                     #print(datum.poseKeypoints[0][i][0])                                                                                                  #  
                     tempX = float(datum.poseKeypoints[0][i][0]) - offsetneck                                                                              #  
                     #print(tempX)                                                                                                                         #
-                    #datum.posekeypoint 是const 下面的寫法是不行的                                                                                        #
+                    #datum.posekeypoint 是const 下面的寫法是不行的                                                                                          #
                     #datum.poseKeypoints[0][i][0]=X+offsetneck                                                                                            #
                 else:                                                                                                                                     #  
                     None                                                                                                                                  #  
@@ -147,7 +147,7 @@ def detection(img ):
                     #print(datum.poseKeypoints[0][i][0])                          #     
                     tempX = float(datum.poseKeypoints[0][i][0]) - offsetneck      #  
                     #print(tempX)                                                 #  
-                    #datum.posekeypoint 是const 下面的寫法是不行的                #
+                    #datum.posekeypoint 是const 下面的寫法是不行的                  #
                     #datum.poseKeypoints[0][i][0]=X-offsetneck                    #  
                 else:                                                             #  
                     None                                                          #  
@@ -391,19 +391,37 @@ def detection(img ):
         #print("AVGx :",tmp_AVGx,"\nAVGy :",tmp_AVGy)
         #print("AVG :" ,tmp_AVGy[4] , tmp_AVGy[7])
         # 圖片越右邊越下面越大
-
-        if(tmp_AVGx[12]-tmp_AVGx[0]<=10):
-            args.flagBody = 1
-            Suggest_temp+=1
-            Suggest.extend(['身體偏左'])
-        if(tmp_AVGx[0]-tmp_AVGx[9]<=10):
+        
+        if(tmp_AVGx[2]>tmp_AVGx[9]):
             args.flagBody = 1
             Suggest_temp+=1
             Suggest.extend(['身體偏右'])
+
+        if(tmp_AVGx[12]>tmp_AVGx[5]):
+            args.flagBody = 1
+            Suggest_temp+=1
+            Suggest.extend(['身體偏左'])
+
+        if(tmp_AVGy[1]-tmp_AVGy[0]<=50):
+            args.flagBody = 2
+            Suggest_temp+=1
+            Suggest.extend(['背沒有打直'])
+
+        if(tmp_AVGy[4]-tmp_AVGy[7]>15):
+            args.flagHand = 1
+            Suggest_temp+=1
+            Suggest.extend(['右手舉過高'])
+
+        if(tmp_AVGy[7]-tmp_AVGy[4]>15):
+            args.flagHand = 1
+            Suggest_temp+=1
+            Suggest.extend(['左手舉過高'])
+
         
         #print(Suggest)
         #######################################################################
         #預測
+        
         with tf.Graph().as_default():
             #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             #每次都要load還需要再改#
@@ -418,7 +436,6 @@ def detection(img ):
                 return ('Ready', img2 , LV , ScoreDU , ScoreDD , None)
             elif rest[0] == 1:
                 return ('Start', img2 , LV , ScoreDU , ScoreDD , Suggest)
-
 #Cv2輸出中文
 def cv2ImgAddText(img, text, left, top, textColor=(0, 255, 0), textSize=20):
     if (isinstance(img, np.ndarray)):  #判斷是否OpenCV圖片類型
@@ -503,7 +520,6 @@ Grade_temp = 0
 #結論評語
 Conclusion_flag = -1
 Conclusion = []
-
 while ret :
     ret, img = cap.read()
     #計算幀數
@@ -542,16 +558,16 @@ while ret :
                 cv2.putText(target_out, 'Stationary', (220, 45), 4, 1, (255, 0, 0), 1, 30)
                 target_out=cv2ImgAddText(target_out, "本次動作評分為"+str(round(Grade/len(tempA), 2)), 205, 55, (255, 0, 0), 30)
                 # 0不完整 1太快 2太慢
-                if(4 not in tempA):
-                    args.flagHand = 4
-                    if(Time <=6):
+                if(3 not in tempA):
+                    flagHand = 4
+                    if(Time <=10):
                         Conclusion_flag =1
                         cv2.rectangle(target_out, (20, 650), (460, 710), (255, 255, 255), -1)
                         target_out=cv2ImgAddText(target_out, "本次動作不完整、做太快", 50, 665, (255, 0, 0), 35)
                         cv2.imwrite(recognize_path+'error/'+action+str(jpgtemp)+'.jpg', target_out)
                         Conclusion.extend(["第"+str(Action_time)+"次動作不完整、做太快"])
                         jpgtemp +=1
-                    elif (Time >=15):
+                    elif (Time >=25):
                         Conclusion_flag = 2
                         cv2.rectangle(target_out, (20, 650), (460, 710), (255, 255, 255), -1)
                         target_out=cv2ImgAddText(target_out, "本次動作不完整、做太慢", 50, 665, (255, 0, 0), 35)
@@ -566,14 +582,14 @@ while ret :
                         Conclusion.extend(["第"+str(Action_time)+"次動作不完整"])
                         jpgtemp +=1
                     
-                elif (Time <=6):
+                elif (Time <=10):
                     Conclusion_flag =1
                     cv2.rectangle(target_out, (110, 650), (370, 710), (255, 255, 255), -1)
                     target_out=cv2ImgAddText(target_out, "本次動作做太快", 125, 665, (255, 0, 0), 35)
                     cv2.imwrite(recognize_path+'error/'+action+str(jpgtemp)+'.jpg', target_out)
                     Conclusion.extend(["第"+str(Action_time)+"次動作做太快"])
                     jpgtemp +=1
-                elif(Time >=15):
+                elif(Time >=25):
                     Conclusion_flag = 2
                     cv2.rectangle(target_out, (110, 650), (370, 710), (255, 255, 255), -1)
                     target_out=cv2ImgAddText(target_out, "本次動作做太慢", 125, 665, (255, 0, 0), 35)
@@ -632,6 +648,7 @@ while ret :
         #cv2.waitKey(110)
     else :
         break
+print("flagbody:",args.flagBody , "flaghand:",args.flagHand)
 #txtpath2 最後總分
 if(Action_time ==0):
     Action_time =1 
@@ -643,15 +660,21 @@ f = open(txtpath2, 'w')
 f.write(str(AVGgrade))
 f.close()
 
-tempstr =""
+tempstr = ""
+
+
 for con in Conclusion:
     tempstr+=con+" "
 if (args.flagBody == 1):
     tempstr+=" 請保持身體立正"
+if (args.flagBody == 2):
+    tempstr+=" 請保持背部打直"
+if (args.flagHand == 1):
+    tempstr+=" 請保持雙手水平同高"
 if (args.flagHand == 3):
-    tempstr+=" 請調整手舉的高度不要超過上胸"
+    tempstr+=" 請調整手舉的高度不要超過鼠蹊部"
 if (args.flagHand == 4):
-    tempstr+=" 請調整手舉的高度維持在與上胸水平"
+    tempstr+=" 請調整手舉的高度維持在與鼠蹊部水平"
 if(tempstr == "" and AVGgrade >=66.66):
     tempstr = "做得不錯 請繼續保持"
 print(tempstr)
@@ -682,7 +705,7 @@ except:
     db.rollback()
 
 
-sql = "select times from Identify where exercise = '%s' AND name = '%s' AND TIME = '%s'   order by times desc limit 1" % (args.actionCH , account[0] , today   ) 
+sql = "select times from Identify where exercise = '%s' AND name = '%s' AND TIME = '%s'   order by times desc limit 1" % (args.actionCH , account[0] , today) 
 print(sql)
 print(account[0])
 try:

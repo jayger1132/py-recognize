@@ -35,19 +35,18 @@ for root, dirs ,files in walk(unrecognize_path):
 
 class MyArgs():
     def __init__(self):
-        #self.video_path = "./data/csv/Side_Lateral_RaiseL/endvideo/Side_Lateral_RaiseL.mp4"
+        #self.video_path = "./data/csv/Side_Lateral_RaiseL/endvideo/Biceps_curl/testb2.mp4"
         self.video_path = (root + '/' + str(file))
-        self.model = './data/model/model_Side_Lateral_RaiseL'
-        self.path = "./data/csv/Side_Lateral_RaiseL/AVG/173"
+        self.model = './data/model/model_Side_Lateral_RaiseR'
+        self.path = "./data/csv/Side_Lateral_RaiseR/AVG/173"
         self.A = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,18,19,20,21,22,23,24]
-        self.actionCH  = "平舉(左)"
+        self.actionCH  = "平舉(右)"
         self.flagHand = 0
         self.flagBody = 0
-
 args = MyArgs()
 dim = (480, 720)
 
-action = "Side_Lateral_RaiseL"
+action = "Side_Lateral_RaiseR"
 recognize_path = "./img/"+action+"/"
 print(recognize_path)
 # 使用 try 建立目錄 
@@ -61,7 +60,8 @@ try:
 # 檔案已存在的例外處理
 except FileExistsError:
     print("檔案已存在。")
-
+args.flagHand = 0
+args.flagBody = 0
 ###########################################################################
 # Import Openpose (Windows/Ubuntu/OSX)
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -652,13 +652,13 @@ if (args.flagHand == 3):
     tempstr+=" 請調整手舉的高度不要超過上胸"
 if (args.flagHand == 4):
     tempstr+=" 請調整手舉的高度維持在與上胸水平"
-if(tempstr == "" and AVGgrade >=66.66):
+if(tempstr == "" and AVGgrade >=66.66 ):
     tempstr = "做得不錯 請繼續保持"
 print(tempstr)
 
 
 
-###########上傳suggest grade到資料庫###########
+###########上傳suggest grade到資料庫##########
 dbhost='justtry.406.csie.nuu.edu.tw'         #
 dbuser='root'                                #
 dbport=33060                                 #
@@ -704,5 +704,6 @@ sys.exit()
 
 #處理 Calling Model.predict in graph mode is not supported when the Model instance was constructed with eager mode enabled
 #https://www.codeleading.com/article/42675321680/ 
+
 
 

@@ -25,10 +25,10 @@ from os import walk
 
 class MyArgs():
     def __init__(self):
-        self.video_path = "./temp/VID_20211216_203838.mp4"
+        self.video_path = "./temp/L.mp4"
         self.model = './data/model/model_Side_Lateral_RaiseL'
         self.path = "./data/csv/Side_Lateral_RaiseL/AVG/173"
-        self.A = [0,1,2,3,4,5,6,7,8,]
+        self.A = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
 args = MyArgs()
 dim = (480, 720)
 
@@ -487,44 +487,6 @@ while ret :
         cv2.waitKey(110)
     else :
         break
-
-
-
-#print(Out_put.items())
-#if(max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級一'] ) :
-#    LV = 1
-#elif (max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級二'] ):
-#    LV = 2
-#elif (max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級三'] ):
-#    LV = 3
-#elif (max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級四'] ):
-#    LV = 4
-#print('等級'+str(LV))
-
-
-#上傳資料
-#dbhost='justtry.406.csie.nuu.edu.tw'
-#dbuser='root'
-#dbport=33060
-#dbpass='nuuCSIE406'
-#dbname='gordon'
-#try:
-#    db = pymysql.connect(host=dbhost,user=dbuser,port=dbport,password=dbpass,database=dbname)
-#    print("連結成功")
-#    cursor = db.cursor()
-#except pymysql.Error as e:
-#    print("連線失敗"+str(e))
-##sql = "SELECT * FROM Identify "
-#sql = "INSERT INTO Identify (exercise , grade , suggest ) VALUES ('二頭彎舉', %d ,'普通' ) " % (temp)
-#try:
-#    cursor.execute(sql)
-#    db.commit()
-#    print("上傳成功")
-#except:
-#    db.rollback()
-
-
-
 
 #處理 Calling Model.predict in graph mode is not supported when the Model instance was constructed with eager mode enabled
 #https://www.codeleading.com/article/42675321680/ 

@@ -10,11 +10,11 @@ import argparse
 import pandas
 #enviroment
 parser = argparse.ArgumentParser()
-csv_path = "./data/csv/Side_Lateral_RaiseR/Side_Lateral_RaiseR_Ready_Test.csv"
+csv_path = "./data/csv/OneArmRowL/Sumo_Squat0.csv"
 #18
-#A = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18]
+A = [0,1,2,3,4,5,6,7,8,9,10,11,12,15,16,17,18,22,23,24]
 #圖片位置
-parser.add_argument("--image_dir", default="./data/imgs/Side_Lateral_RaiseR/DNN_Ready_Test", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_dir", default="./data/imgs/Sumo_Squat/Sumo_Squat177/Sumo_Squat0/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 #def write_csv()
 try:
     # Import Openpose (Windows/Ubuntu/OSX)
@@ -24,10 +24,8 @@ try:
         if platform == "win32":
             # Change these variables to point to the correct folder
             # (Release/x64 etc.)
-            
-            sys.path.append('D:\\openpose\\openpose-master\\build\\python\\openpose\\Release')
-            os.add_dll_directory('D:\\openpose\\openpose-master\\build\\x64\\Release')
-            os.add_dll_directory('D:\\openpose\\openpose-master\\build\\bin')
+            sys.path.append(dir_path + '/../../python/openpose/Release');
+            os.environ['PATH']  = os.environ['PATH'] + ';' + dir_path + '/../../x64/Release;' +  dir_path + '/../../bin;'
             import pyopenpose as op
         else:
             # Change these variables to point to the correct folder
@@ -87,7 +85,7 @@ try:
             # 建立 CSV 檔寫入器
             writer = csv.writer(csvfile)
             tmp_data = []
-            for i in range(0,25):
+            for i in A:
                 #extend 是[0],[1],[2]這樣+ append是[012],[012],[012]的+
                 tmp_data.extend(['x' + str(i),'y' + str(i),'score' + str(i)])
             #print(tmp_data)
@@ -126,7 +124,7 @@ try:
             data = [] #儲存成一列(橫排)
             temp = (0,0,0)
             # range(0,25) => 0~24
-            for i in range(0,25):
+            for i in A:
                 # 不去偏移neck
                 if i != 1 :
                     if float(str(datum.poseKeypoints[0][i][0])) != 0.0:
@@ -145,12 +143,12 @@ try:
             
             writer.writerow(data)
             
-        #writer.writerow(["","",""]) #nan
+        #    #writer.writerow(["","",""]) #nan
 
         if not args[0].no_display:
             cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", datum.cvOutputData)
-            key = cv2.waitKey(15)
-            if key == 27: break
+            #cv2.imwrite(recognize_path+action+str(int(count/6))+'.jpg', datum.cvOutputData)
+            cv2.waitKey(100)
 
     end = time.time()
     print("OpenPose demo successfully finished. Total time: " + str(end - start) + " seconds")
@@ -166,6 +164,7 @@ try:
 except Exception as e:
     print(e)
     sys.exit(0)
+
 
 
 

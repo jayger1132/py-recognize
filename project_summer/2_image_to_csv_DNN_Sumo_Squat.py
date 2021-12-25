@@ -10,11 +10,11 @@ import argparse
 import pandas
 #enviroment
 parser = argparse.ArgumentParser()
-csv_path = "./data/csv/Side_Lateral_RaiseR/Side_Lateral_RaiseR_Ready_Test.csv"
+csv_path = "./data/csv/Sumo_Squat/AVG/177/Sumo_Squat0.csv"
 #18
 #A = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,15,16,17,18]
 #圖片位置
-parser.add_argument("--image_dir", default="./data/imgs/Side_Lateral_RaiseR/DNN_Ready_Test", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
+parser.add_argument("--image_dir", default="./data/imgs/Sumo_Squat/Sumo_Squat177/Sumo_Squat0/", help="Process a directory of images. Read all standard formats (jpg, png, bmp, etc.).")
 #def write_csv()
 try:
     # Import Openpose (Windows/Ubuntu/OSX)
@@ -24,8 +24,7 @@ try:
         if platform == "win32":
             # Change these variables to point to the correct folder
             # (Release/x64 etc.)
-            
-            sys.path.append('D:\\openpose\\openpose-master\\build\\python\\openpose\\Release')
+            sys.path.append('D:\\openpose\\openpose-master\\build\python\\openpose\\Release')
             os.add_dll_directory('D:\\openpose\\openpose-master\\build\\x64\\Release')
             os.add_dll_directory('D:\\openpose\\openpose-master\\build\\bin')
             import pyopenpose as op
@@ -145,12 +144,12 @@ try:
             
             writer.writerow(data)
             
-        #writer.writerow(["","",""]) #nan
+        #    #writer.writerow(["","",""]) #nan
 
         if not args[0].no_display:
             cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", datum.cvOutputData)
-            key = cv2.waitKey(15)
-            if key == 27: break
+            cv2.imwrite(recognize_path+action+str(int(count/6))+'.jpg', datum.cvOutputData)
+            cv2.waitKey(100)
 
     end = time.time()
     print("OpenPose demo successfully finished. Total time: " + str(end - start) + " seconds")

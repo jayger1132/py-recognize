@@ -31,10 +31,10 @@ for root, dirs ,files in walk(unrecognize_path):
         
 class MyArgs():
     def __init__(self):
-        self.video_path = (root + '/' + str(file))
+        self.video_path = "./data/csv/Side_Lateral_RaiseL/endvideo/Biceps_curl/testb.mp4"
         self.model = './data/model/model_Biceps_curl'
         self.path = "./data/csv/Biceps_curl/AVG/173"
-        self.A = [0,1,2,3,4,5,6,7]
+        self.A = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]
 args = MyArgs()
 dim = (480, 720)
 
@@ -488,32 +488,38 @@ while ret :
         print("Time : " , Time , "Action_time : " ,Action_time)
         print("TempA : ",tempA ,"\nTempSCDU : " ,tempSCDU , "\nTempSCDD : " ,tempSCDD)
         #print(is_okay,"===============================================")
-        cv2.imwrite('./img/Side_Lateral_RaiseL/'+str(int(count/6))+'.jpg', target_out)    
+        cv2.imwrite('./temp/normal/V2'+str(int(count/6))+'.jpg', target_out)    
         #target_out=(cv2.cvtColor(target_out, cv2.COLOR_BGR2RGB))
-        cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target_out)
-        cv2.waitKey(110)
+        #cv2.imshow("OpenPose 1.7.0 - Tutorial Python API", target_out)
+        #cv2.waitKey(110)
     else :
         break
+
 import numpy as np
 import cv2
 from os import walk
 #讀取一張圖片
 dim = (480,720)
-videowrite = cv2.VideoWriter('./img/Side_Lateral_RaiseL/test.mp4',-1,2,dim)#20是幀數，size是圖片尺寸
+path = "./temp/normal/"
+#完成寫入物件的建立，第一個引數是合成之後的影片的名稱，第二個引數是可以使用的編碼器，第三個引數是幀率即每秒鐘展示多少張圖片，第四個引數是圖片大小資訊
+videowrite = cv2.VideoWriter(path+'V2.mp4',-1,2,dim)#20是幀數，size是圖片尺寸
 img_array=[]
-path = "./img/Side_Lateral_RaiseL/"
+
 for root, dirs ,files in walk(path):
     len=(len(files))
     #print("路徑：", root)
     #print("  目錄：", dirs)
     #print("  檔案：", files)
         
-for filename in [(path+'{0}.jpg').format(i) for i in range(len-1)]:
+for filename in [(path+"V2"+'{0}.jpg').format(i) for i in range(len-1)]:
     img = cv2.imread(filename)
     if img is None:
         print(filename + " is error!")
         continue
     img_array.append(img)
+#print(img_array)
+for i in img_array :
+    videowrite.write(i)
 #print(img_array)
 #print(Out_put.items())
 #if(max(Out_put['等級一'],Out_put['等級二'],Out_put['等級三'],Out_put['等級四']) == Out_put['等級一'] ) :

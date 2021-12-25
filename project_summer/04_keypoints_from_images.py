@@ -88,4 +88,3 @@ try:
     print("OpenPose demo successfully finished. Total time: " + str(end - start) + " seconds")
 except Exception as e:
     print(e)
-    sys.exit(-1)
