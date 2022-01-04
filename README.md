@@ -209,3 +209,5 @@ def testAcc(_model, frac = None):
 ##### https://kknews.cc/zh-tw/code/6lvzmaq.html
 ##### https://ithelp.ithome.com.tw/articles/10197257
 ##### https://keras-cn.readthedocs.io/en/latest/models/model/
+### 串流參考,建議
+##### https://pacific-emmental-9bd.notion.site/29755d2e7eb84077a4b20d00e202dab7
